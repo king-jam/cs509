@@ -82,35 +82,12 @@
     <additional_attributes/>
   </element>
   <element>
-    <id>UMLUseCase</id>
-    <coordinates>
-      <x>810</x>
-      <y>510</y>
-      <w>160</w>
-      <h>60</h>
-    </coordinates>
-    <panel_attributes>VerifySeatAvailability</panel_attributes>
-    <additional_attributes/>
-  </element>
-  <element>
-    <id>Relation</id>
-    <coordinates>
-      <x>660</x>
-      <y>250</y>
-      <w>170</w>
-      <h>310</h>
-    </coordinates>
-    <panel_attributes>lt=.&gt;
-&lt;&lt;includes&gt;&gt;</panel_attributes>
-    <additional_attributes>10.0;10.0;150.0;290.0</additional_attributes>
-  </element>
-  <element>
     <id>UMLGeneric</id>
     <coordinates>
-      <x>440</x>
+      <x>470</x>
       <y>50</y>
-      <w>610</w>
-      <h>530</h>
+      <w>580</w>
+      <h>440</h>
     </coordinates>
     <panel_attributes>AirlineReservationSystem
 halign=left</panel_attributes>
@@ -159,17 +136,6 @@ halign=left</panel_attributes>
     </coordinates>
     <panel_attributes/>
     <additional_attributes>10.0;10.0;220.0;160.0</additional_attributes>
-  </element>
-  <element>
-    <id>Relation</id>
-    <coordinates>
-      <x>960</x>
-      <y>280</y>
-      <w>220</w>
-      <h>280</h>
-    </coordinates>
-    <panel_attributes/>
-    <additional_attributes>10.0;260.0;200.0;10.0</additional_attributes>
   </element>
   <element>
     <id>UMLUseCase</id>
