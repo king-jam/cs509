@@ -13,17 +13,6 @@
     <additional_attributes/>
   </element>
   <element>
-    <id>UMLUseCase</id>
-    <coordinates>
-      <x>510</x>
-      <y>250</y>
-      <w>190</w>
-      <h>50</h>
-    </coordinates>
-    <panel_attributes>CancelSeat</panel_attributes>
-    <additional_attributes/>
-  </element>
-  <element>
     <id>UMLGeneric</id>
     <coordinates>
       <x>490</x>
@@ -49,12 +38,12 @@ halign=left</panel_attributes>
   <element>
     <id>UMLActor</id>
     <coordinates>
-      <x>1010</x>
+      <x>1040</x>
       <y>160</y>
-      <w>120</w>
+      <w>60</w>
       <h>110</h>
     </coordinates>
-    <panel_attributes>ClientDatabase</panel_attributes>
+    <panel_attributes>Server</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
@@ -71,17 +60,6 @@ halign=left</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>270</x>
-      <y>190</y>
-      <w>260</w>
-      <h>100</h>
-    </coordinates>
-    <panel_attributes/>
-    <additional_attributes>10.0;10.0;240.0;80.0</additional_attributes>
-  </element>
-  <element>
-    <id>Relation</id>
-    <coordinates>
       <x>680</x>
       <y>180</y>
       <w>390</w>
@@ -89,16 +67,5 @@ halign=left</panel_attributes>
     </coordinates>
     <panel_attributes/>
     <additional_attributes>10.0;20.0;370.0;20.0</additional_attributes>
-  </element>
-  <element>
-    <id>Relation</id>
-    <coordinates>
-      <x>690</x>
-      <y>200</y>
-      <w>380</w>
-      <h>90</h>
-    </coordinates>
-    <panel_attributes/>
-    <additional_attributes>10.0;70.0;360.0;10.0</additional_attributes>
   </element>
 </diagram>
