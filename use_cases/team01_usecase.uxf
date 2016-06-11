@@ -113,17 +113,6 @@
     <additional_attributes/>
   </element>
   <element>
-    <id>UMLUseCase</id>
-    <coordinates>
-      <x>408</x>
-      <y>828</y>
-      <w>180</w>
-      <h>48</h>
-    </coordinates>
-    <panel_attributes>Cancel reservation</panel_attributes>
-    <additional_attributes/>
-  </element>
-  <element>
     <id>Relation</id>
     <coordinates>
       <x>96</x>
@@ -133,17 +122,6 @@
     </coordinates>
     <panel_attributes/>
     <additional_attributes>10.0;10.0;270.0;40.0</additional_attributes>
-  </element>
-  <element>
-    <id>Relation</id>
-    <coordinates>
-      <x>96</x>
-      <y>732</y>
-      <w>336</w>
-      <h>144</h>
-    </coordinates>
-    <panel_attributes/>
-    <additional_attributes>10.0;10.0;260.0;100.0</additional_attributes>
   </element>
   <element>
     <id>Relation</id>
@@ -319,17 +297,6 @@ bg=blue</panel_attributes>
     </coordinates>
     <panel_attributes/>
     <additional_attributes>10.0;400.0;650.0;10.0</additional_attributes>
-  </element>
-  <element>
-    <id>Relation</id>
-    <coordinates>
-      <x>576</x>
-      <y>276</y>
-      <w>840</w>
-      <h>600</h>
-    </coordinates>
-    <panel_attributes/>
-    <additional_attributes>10.0;480.0;680.0;10.0</additional_attributes>
   </element>
   <element>
     <id>Relation</id>
