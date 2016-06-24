@@ -1,7 +1,7 @@
 /**
  * 
  */
-package CS509.client.airplane;
+package client;
 
 import java.util.ArrayList;
 

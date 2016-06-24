@@ -1,7 +1,7 @@
 /**
  * 
  */
-package CS509.client.flight;
+package client.flight;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;

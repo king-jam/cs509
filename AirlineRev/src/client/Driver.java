@@ -1,11 +1,11 @@
 /**
  * 
  */
-package CS509.client.driver;
+package client;
 
-import CS509.client.dao.ServerInterface;
-import CS509.client.flight.Flight;
-import CS509.client.flight.Flights;
+import client.dao.ServerInterface;
+import client.flight.Flight;
+import client.flight.Flights;
 
 
 /**

@@ -1,7 +1,7 @@
 /**
  * 
  */
-package CS509.client.airport;
+package client;
 
 /**
  * This class holds values pertaining to a single Airport. Class member attributes

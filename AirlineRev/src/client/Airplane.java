@@ -1,7 +1,7 @@
 /**
  * 
  */
-package CS509.client.airplane;
+package client;
 
 /**
  * This class stores information about an airplane. This class presents the

@@ -1,7 +1,7 @@
 /**
  * 
  */
-package CS509.client.util;
+package client.util;
 
 /**
  * @author blake
