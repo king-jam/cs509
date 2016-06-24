@@ -1,0 +1,273 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="14.2">
+  <zoom_level>7</zoom_level>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>35</x>
+      <y>532</y>
+      <w>147</w>
+      <h>161</h>
+    </coordinates>
+    <panel_attributes>_Airplane_
+--
+-Model: String
+-Manufacturer: String
+-FirstClassSeats: int
+-CoachSeats: int
+--
++setModel(String)
++getModel(): String
++setManufacturer(String)
++getManufacturer(): String
++setFirstClassSeats(int)
++getFirstClassSeats(): int
++setCoachSeats(int)
++getCoachSeats(): int</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>35</x>
+      <y>357</y>
+      <w>147</w>
+      <h>161</h>
+    </coordinates>
+    <panel_attributes>_Airport_
+--
+-Name: String
+-Code: String
+-Latitude: double
+-Longitude: double
+--
++setName(String)
++getName(): String
++setCode(String)
++getCode(): String
++setLatitude(double)
++getLatitude(): double
++setLongitude(double)
++getLongitude(): double</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>301</x>
+      <y>301</y>
+      <w>147</w>
+      <h>392</h>
+    </coordinates>
+    <panel_attributes>_Flight_
+--
+-Number: String
+-FlightTime: String
+-Airplane: String
+-DepartCode: String
+-DepartTime: String
+-ArrivalCode: String
+-ArrivalTime: String
+-FirstClassPrice: String
+-FirstClassSeats: int
+-CoachPrice: String
+-CoachSeats: int
+--
++setNumber(String)
++getNumber(): String
++setFlightTime(String)
++getFlightTime(): String
++setAirplane(String)
++getAirplane(): String
++setDepartCode(String)
++getDepartCode(): String
++setDepartTime(String)
++getDepartTime(): String
++setArrivalCode(String)
++getArrivalCode(): String
++setArrivalTime(String)
++getArrivalTime(): String
++setFirstClassPrice(String)
++getFirstClassPrice(): String
++setFirstClassSeats(int)
++getFirstClassSeats(): int
++setCoachPrice(String)
++getCoachPrice(): String
++setCoachSeats(int)
++getCoachSeats(): int</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>322</x>
+      <y>168</y>
+      <w>147</w>
+      <h>84</h>
+    </coordinates>
+    <panel_attributes>_ReservationOption_
+--
+-Flights[]: Flight
+--
++getFlight(int): Flight
++getNumLayovers(): int
++getPrice(): double
++sgtTotalTime(): String</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>35</x>
+      <y>308</y>
+      <w>203</w>
+      <h>35</h>
+    </coordinates>
+    <panel_attributes>_TimeLocal_
+--
+--
++getAirportTime(String, double, double): String</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>581</x>
+      <y>294</y>
+      <w>175</w>
+      <h>140</h>
+    </coordinates>
+    <panel_attributes>_DatabaseInterface_
+--
+-serverURL: String
+-serverPort: int
+--
++getAirports(): String
++getAirplanes(): String
++getDepartingFlights(String): String
++getArrivingFlights(String): String
++resetDatabase(): boolean
++lockDatabase(): boolean
++reserveSeat(int, String): boolean
++unlockDatabase(): boolean</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>420</x>
+      <y>0</y>
+      <w>175</w>
+      <h>126</h>
+    </coordinates>
+    <panel_attributes>_FlightSearch_
+--
+-departureAirportCode: String
+-arrivalAirportCode: String
+-oneWay: boolean
+-seatPreference: String
+-departureDate: String
+-returnDate: String
+--
++getOptions(): ReservationOption[]
++sortOptions(): int
++reserveFlight(): boolean</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>63</x>
+      <y>196</y>
+      <w>231</w>
+      <h>49</h>
+    </coordinates>
+    <panel_attributes>_FlightSearchSorter_
+--
+--
++byPrice(ReservationOption[]): ReservationOption[]
++byTime(ReservationOption[]): ReservationOption[]</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>175</x>
+      <y>385</y>
+      <w>140</w>
+      <h>21</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-</panel_attributes>
+    <additional_attributes>180.0;10.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>175</x>
+      <y>581</y>
+      <w>140</w>
+      <h>21</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-</panel_attributes>
+    <additional_attributes>180.0;10.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>231</x>
+      <y>315</y>
+      <w>84</w>
+      <h>21</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-</panel_attributes>
+    <additional_attributes>100.0;10.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>224</x>
+      <y>77</y>
+      <w>210</w>
+      <h>133</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-</panel_attributes>
+    <additional_attributes>280.0;10.0;10.0;170.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>581</x>
+      <y>119</y>
+      <w>91</w>
+      <h>189</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-</panel_attributes>
+    <additional_attributes>10.0;10.0;110.0;250.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>371</x>
+      <y>245</y>
+      <w>35</w>
+      <h>70</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;&lt;-
+m1=1
+m2=0..*</panel_attributes>
+    <additional_attributes>20.0;10.0;10.0;80.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>462</x>
+      <y>119</y>
+      <w>49</w>
+      <h>98</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;&lt;-
+m1=1
+m2=  0..*</panel_attributes>
+    <additional_attributes>50.0;10.0;10.0;120.0</additional_attributes>
+  </element>
+</diagram>
