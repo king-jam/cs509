@@ -1,4 +1,4 @@
-# CS509 WPI [![Build Status](https://travis-ci.org/king-jam/CS509.svg?branch=master)](https://travis-ci.org/king-jam/CS509)
+# CS509 WPI [![Build Status](https://travis-ci.org/king-jam/cs509.svg?branch=master)](https://travis-ci.org/king-jam/cs509)
 
 Repository for CS509 Air Reservation System
 
