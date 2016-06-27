@@ -3,9 +3,13 @@
  */
 package client.driver;
 
+import java.text.ParseException;
+import java.util.ArrayList;
+
 import client.dao.ServerInterface;
 import client.flight.Flight;
 import client.flight.Flights;
+import client.search.*;
 
 
 /**
@@ -17,14 +21,25 @@ public class Driver {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		ServerInterface resSys = new ServerInterface();
+		FlightSearch search=new FlightSearch("BOS","LGA",true,"firstclass","2016 May 10 00:05 GMT","2016 May 10 00:30 GMT");
+		try {
+			ArrayList<ReservationOptionDummy> ar =search.getOptions();
+			System.out.println(ar.size());
+			
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		System.out.println("done");
+
+		/*ServerInterface resSys = new ServerInterface();
 		
 		// Try to get a list of airports
-		String xmlAirport = resSys.getAirports("WorldPlaneInc");
+		String xmlAirport = resSys.getAirports("01");
 		System.out.println(xmlAirport);
 
 		// Get a sample list of flights from server
-		String xmlFlights = resSys.getFlights("WorldPlaneInc", "BOS", "2016_05_10");
+		String xmlFlights = resSys.getFlights("Team01", "BOS", "2016_05_10");
 		System.out.println(xmlFlights);
 		
 		// Create the aggregate flights
@@ -65,6 +80,6 @@ public class Driver {
 			System.out.println("Seat Reserved Successfully");
 		} else {
 			System.out.println("Reservation Failed");
-		}
+		}*/
 	}
 }
