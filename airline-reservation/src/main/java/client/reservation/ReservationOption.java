@@ -37,6 +37,10 @@ public class ReservationOption {
 		this(flightOne,null,null);
 	}
 	
+	public ReservationOption(ArrayList<Flight> flightList) {
+		this.flightList = flightList;
+	}
+
 	public Flight getFlight(int index) {
 		Flight flight;
 		try {
