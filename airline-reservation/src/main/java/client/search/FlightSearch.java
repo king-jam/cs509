@@ -116,6 +116,13 @@ public class FlightSearch {
 			
 	}
 	
+	public static ArrayList<Flight> cloneList(ArrayList<Flight> list) {
+		ArrayList<Flight> clone = new ArrayList<Flight>(list.size());
+	    for(Flight item: list) 
+	    	clone.add(item);
+	    return clone;
+	}
+	
 	public ArrayList<ReservationOption> getOptions() throws ParseException{
 		
 		ArrayList<Flight> reservedflights=new ArrayList<Flight>();
@@ -132,7 +139,7 @@ public class FlightSearch {
 			//determining flight with no layover
 			if(flight.getmCodeArrival().equals(this.mArrivalAirportCode)){
 				reservedflights.add(flight);
-				reservedOptions.add(new ReservationOption(reservedflights));
+				reservedOptions.add(new ReservationOption(cloneList(reservedflights)));
 				reservedflights.clear();	
 				
 			}
@@ -152,7 +159,7 @@ public class FlightSearch {
 							if(checkLayoverTime(flight.getmTimeArrival(),firstLayoverFlight.getmTimeDepart())){
 							reservedflights.add(flight);
 							reservedflights.add(firstLayoverFlight);
-							reservedOptions.add(new ReservationOption(reservedflights));
+							reservedOptions.add(new ReservationOption(cloneList(reservedflights)));
 							reservedflights.clear();
 							}
 						}
@@ -174,7 +181,7 @@ public class FlightSearch {
 										reservedflights.add(flight);
 										reservedflights.add(firstLayoverFlight);
 										reservedflights.add(secondLayoverFlight);
-										reservedOptions.add(new ReservationOption(reservedflights));
+										reservedOptions.add(new ReservationOption(cloneList(reservedflights)));
 										reservedflights.clear();
 											
 									}
