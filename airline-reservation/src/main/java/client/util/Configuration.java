@@ -17,5 +17,23 @@ public final class Configuration {
 	public static final long MIN_LAYOVER_TIME=1800*1000;//in milli seconds
 	public static final int DAY_HOUR_NEXT_FLIGHT=21;//in 24 hr format,9:00pm
 	
+	public static String getAgency() {
+		return TICKET_AGENCY;
+	}
+	
+	public static int getMaxLayover() {
+		return MAX_LAYOVER;
+	}
 
+	public static long getMaxLayoverTime() {
+		return MAX_LAYOVER_TIME;
+	}
+	
+	public static long getMinLayoverTime() {
+		return MIN_LAYOVER_TIME;
+	}
+	
+	public static int getDayHourNextFlight() {
+		return DAY_HOUR_NEXT_FLIGHT;
+	}
 }

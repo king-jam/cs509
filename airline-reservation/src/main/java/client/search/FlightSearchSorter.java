@@ -15,11 +15,14 @@ import client.reservation.*;
  */
 public class FlightSearchSorter {
 	
-	public ArrayList<ReservationOption> sortPrice(boolean ascending, ArrayList<ReservationOption> resOptions) {
+	public ArrayList<ReservationOption> sortPrice(
+			boolean ascending,
+			ArrayList<ReservationOption> resOptions,
+			String seatType) {
 		ArrayList<ReservationOption> sortedReservations = new ArrayList<ReservationOption>();
 		
 		for (ReservationOption resOption : resOptions) {
-			ReservationOption cheapestReservation = cheapestReservation(resOptions);
+			ReservationOption cheapestReservation = cheapestReservation(resOptions, seatType);
 			sortedReservations.add(cheapestReservation);
 			resOptions.remove(resOption);
 		}
@@ -43,11 +46,11 @@ public class FlightSearchSorter {
 		return sortedReservations;
 	}
 	
-	public ReservationOption cheapestReservation(ArrayList<ReservationOption> resOptions) {
+	public ReservationOption cheapestReservation(ArrayList<ReservationOption> resOptions, String seatType) {
 		ReservationOption cheapestRes = resOptions.get(0);
 		for (ReservationOption resOption: resOptions) {
 			//TODO: need to consider coach seating
-			if (resOption.getPrice(true) < cheapestRes.getPrice(true)) {
+			if (resOption.getPrice(seatType) < cheapestRes.getPrice(seatType)) {
 				cheapestRes = resOption;
 			}
 		}

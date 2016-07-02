@@ -1,11 +1,9 @@
 package client.search;
 
-import java.io.Console;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
-import java.util.List;
 import java.util.Date;
 import java.util.TimeZone;
 import java.util.Calendar;
@@ -29,25 +27,21 @@ public class FlightSearch {
 	 */
 	private String mDepartureAirportCode;
 	private String mArrivalAirportCode;
-	private boolean mOneWay;
-	private String mSeatPrefrence;
 	private String mDepartureDate;
-	private String mReturnDate;
-	private Configuration mConfig;
+	private String mSeatPreference;
+	private String mTicketAgency;
 	private ServerInterface mServerInterface;
 	
 	
 	public FlightSearch(String departureAirportCode,
-			String ArrivalAirportCode, boolean oneWay, String seatPrefrence,
-			String Departuredate, String ReturnDate) {
+			String arrivalAirportCode,
+			String departuredate, String seatPreference) {
 		
 		this.mDepartureAirportCode = departureAirportCode;
-		this.mArrivalAirportCode = ArrivalAirportCode;
-		this.mOneWay = oneWay;
-		this.mSeatPrefrence = seatPrefrence;
-		this.mDepartureDate = Departuredate;
-		this.mReturnDate = ReturnDate;
-		this.mConfig=Configuration.getInstance();
+		this.mArrivalAirportCode = arrivalAirportCode;
+		this.mDepartureDate = departuredate;
+		this.mSeatPreference = seatPreference;
+		this.mTicketAgency=Configuration.getAgency();
 		this.mServerInterface=new ServerInterface();
 	}
 	
@@ -58,8 +52,8 @@ public class FlightSearch {
 		departureDateFormatter.setTimeZone(TimeZone.getTimeZone("GMT"));
 		String departuredate=departureDateFormatter.format(formatter.parse(date));
 		return departuredate;
-	
 	}
+	
 	public boolean checkDepartureTime(String arrivalTime,String departureTime) throws ParseException{
 		SimpleDateFormat formatter=new  SimpleDateFormat("yyyy MMM dd HH:mm z");
 		Date arrival=formatter.parse(arrivalTime);
@@ -81,8 +75,6 @@ public class FlightSearch {
 		}
 		else
 			return false;
-			
-			
 	}
 	
 	public String addOneday(String date) throws ParseException{
@@ -91,7 +83,6 @@ public class FlightSearch {
 		calendar.setTime(formatter.parse(date));
 		calendar.add(Calendar.DATE, 1);
 		return formatter.format(calendar.getTime());
-			
 	}
 	
 	public boolean checkLayoverTime(String arrivalTime,String departureTime) throws ParseException{
@@ -106,14 +97,12 @@ public class FlightSearch {
 			return false;
 		else
 			return true;
-		
 	}
 	
 	public void addFlights(String airportCode,String departuredate,Flights flights){
-		String xmlFlightData=mServerInterface.getFlights(mConfig.TICKET_AGENCY,
+		String xmlFlightData=mServerInterface.getFlights(mTicketAgency,
 				airportCode,departuredate);
 		flights.addAll(xmlFlightData);
-			
 	}
 	
 	public static ArrayList<Flight> cloneList(ArrayList<Flight> list) {
@@ -131,21 +120,29 @@ public class FlightSearch {
 		Flights secondOutboundflights=new Flights();
 		Flights thirdOutboundflights=new Flights();
 
-
 		addFlights(this.mDepartureAirportCode,dateFormatter(this.mDepartureDate),firstOutboundflights);
 
 		for(Flight flight:firstOutboundflights){
+			
+			// eliminate all flights without seats for our seat type
+			if(mSeatPreference.equals("firstclass")) {
+				if(flight.getmSeatsFirstclass() == 0) {
+					System.out.println("Full Flight");
+					continue;
+				}
+			} else {
+				if(flight.getmSeatsCoach() == 0) {
+					System.out.println("Full Flight");
+					continue;
+				}
+			}
 			
 			//determining flight with no layover
 			if(flight.getmCodeArrival().equals(this.mArrivalAirportCode)){
 				reservedflights.add(flight);
 				reservedOptions.add(new ReservationOption(cloneList(reservedflights)));
 				reservedflights.clear();	
-				
-			}
-			
-			else{
-
+			} else {
 				    addFlights(flight.getmCodeArrival(),dateFormatter(flight.getmTimeArrival()),secondOutboundflights);
 				    if(checkNextDayFlight(flight.getmTimeArrival())){
 				    	addFlights(flight.getmCodeArrival(),dateFormatter(addOneday(flight.getmTimeArrival())),secondOutboundflights);
@@ -194,20 +191,9 @@ public class FlightSearch {
 						}
 						
 					}
-					secondOutboundflights.clear();
-								
+					secondOutboundflights.clear();		
 			}
-
-			
 		}
 		return reservedOptions;
-		
 	}
-	
-	
-	
-	
-
-	
-
 }
