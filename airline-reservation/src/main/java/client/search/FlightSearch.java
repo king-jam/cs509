@@ -127,12 +127,10 @@ public class FlightSearch {
 			// eliminate all flights without seats for our seat type
 			if(mSeatPreference.equals("firstclass")) {
 				if(flight.getmSeatsFirstclass() == 0) {
-					System.out.println("Full Flight");
 					continue;
 				}
 			} else {
 				if(flight.getmSeatsCoach() == 0) {
-					System.out.println("Full Flight");
 					continue;
 				}
 			}
