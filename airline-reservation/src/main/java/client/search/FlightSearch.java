@@ -32,7 +32,14 @@ public class FlightSearch {
 	private String mTicketAgency;
 	private ServerInterface mServerInterface;
 	
-	
+	/**
+	 * Constructor
+	 * 
+	 * @param departureAirportCode (required) valid departure airport code.
+	 * @param ArrivalAirportCode (required) valid arrival airport code.
+	 * @param seatPrefrence represents first class or coach seating.
+	 * @param Departuredate represents departure date in "yyyy MMM dd HH:mm z" format.
+	 */
 	public FlightSearch(String departureAirportCode,
 			String arrivalAirportCode,
 			String departuredate, String seatPreference) {
@@ -45,6 +52,13 @@ public class FlightSearch {
 		this.mServerInterface=new ServerInterface();
 	}
 	
+	/**
+	 * This method converts a date string from "yyyy MMM dd HH:mm z" format to "yyyy_MM_dd" format.
+	 * 
+	 * @param date represents the string in "yyyy MMM dd HH:mm z" format.
+	 * @return string in "yyyy_MM_dd"
+	 * @throws ParseException
+	 */
 	public String dateFormatter(String date) throws ParseException{
 		
 		SimpleDateFormat formatter=new  SimpleDateFormat("yyyy MMM dd HH:mm z");
@@ -54,6 +68,14 @@ public class FlightSearch {
 		return departuredate;
 	}
 	
+	/**
+	 * This method checks if the arrival time of a particular flight is after the departure time of another.
+	 * 
+	 * @param arrivalTime represents the string in "yyyy MMM dd HH:mm z" format.
+	 * @param departureTime represents the string in "yyyy MMM dd HH:mm z" format.
+	 * @return
+	 * @throws ParseException
+	 */
 	public boolean checkDepartureTime(String arrivalTime,String departureTime) throws ParseException{
 		SimpleDateFormat formatter=new  SimpleDateFormat("yyyy MMM dd HH:mm z");
 		Date arrival=formatter.parse(arrivalTime);
@@ -64,6 +86,14 @@ public class FlightSearch {
 			return false;
 	}
 	
+	/**
+	 * This method verifies whether a arrival time of a flight is after 9pm.
+	 * It is a constraint to check for connecting flights in the next day.
+	 * 
+	 * @param arrivalTime represents the arrival time of a flight in "yyyy MMM dd HH:mm z" string format.
+	 * @return true if arrival time of a flight is after 9pm else returns false boolean value.
+	 * @throws ParseException
+	 */
 	public boolean checkNextDayFlight(String arrivalTime) throws ParseException {
 		SimpleDateFormat formatter=new  SimpleDateFormat("yyyy MMM dd HH:mm z");
 		Calendar calendar=GregorianCalendar.getInstance();
@@ -77,6 +107,13 @@ public class FlightSearch {
 			return false;
 	}
 	
+	/**
+	 * This method adds one day to date given as the parameter.
+	 * 
+	 * @param date represents the date  in "yyyy MMM dd HH:mm z" string format.
+	 * @return date which is incremented by one,also represented in "yyyy MMM dd HH:mm z" string format.
+	 * @throws ParseException
+	 */
 	public String addOneday(String date) throws ParseException{
 		SimpleDateFormat formatter=new  SimpleDateFormat("yyyy MMM dd HH:mm z");
 		Calendar calendar=GregorianCalendar.getInstance();
@@ -85,6 +122,14 @@ public class FlightSearch {
 		return formatter.format(calendar.getTime());
 	}
 	
+	/**
+	 * This method checks for the constraint that the layover_time >= 30min and layover_time<=3hrs.
+	 * The above constraint is verified for connecting flights
+	 * @param arrivalTime represents the arrival time of a flight in "yyyy MMM dd HH:mm z" string format.
+	 * @param departureTime represents the departure time of a flight in "yyyy MMM dd HH:mm z" string format.
+	 * @return true if constraint is followed else returns false.
+	 * @throws ParseException
+	 */
 	public boolean checkLayoverTime(String arrivalTime,String departureTime) throws ParseException{
 		SimpleDateFormat formatter=new  SimpleDateFormat("yyyy MMM dd HH:mm z");
 		long arrival=formatter.parse(arrivalTime).getTime();
@@ -99,12 +144,24 @@ public class FlightSearch {
 			return true;
 	}
 	
+	/**
+	 * This method uses the server interface to get flight information and then add it to a collection.
+	 * 
+	 * @param airportCode (required) valid arrival airport code.
+	 * @param departuredate in "yyyy_MM_dd" string format.
+	 * @param flights is of the type {@link client.flight.Flights} to hold Flight objects({@link client.flight.Flight}).
+	 */
 	public void addFlights(String airportCode,String departuredate,Flights flights){
 		String xmlFlightData=mServerInterface.getFlights(mTicketAgency,
 				airportCode,departuredate);
 		flights.addAll(xmlFlightData);
 	}
 	
+	/**
+	 * This method clones a list of type ArrayList<Flight>
+	 * @param list
+	 * @return  a cloned list of type ArrayList<Flight>
+	 */
 	public static ArrayList<Flight> cloneList(ArrayList<Flight> list) {
 		ArrayList<Flight> clone = new ArrayList<Flight>(list.size());
 	    for(Flight item: list) 
@@ -112,6 +169,11 @@ public class FlightSearch {
 	    return clone;
 	}
 	
+	/**
+	 * This method uses the search parameters to search for valid flights 
+	 * @return an arrayList of the type {@link client.reservation.ReservationOption}
+	 * @throws ParseException
+	 */
 	public ArrayList<ReservationOption> getOptions() throws ParseException{
 		
 		ArrayList<Flight> reservedflights=new ArrayList<Flight>();
