@@ -22,13 +22,24 @@ import client.search.FlightSearch;
 import client.search.FlightSearchSorter;
 import client.util.*;
 /**
+ * This class is a debug runner UI for testing and validation full functionality.
+ * 
  * @author James
- *
+ * @version 1
+ * @since 07/03/2016
  */
 public class ConsoleUI {	
-
+	/**
+	 * Global Data attributes for a ConsoleUI
+	 */
 	private static final String quitKeyword = "q";
-
+	/**
+	 * prints a formatted ReservationOption for display
+	 * 
+	 * @param option contains the ReservationOption 
+	 * @param seatPreference contains the client seat preference for price display
+	 * 
+	 */
 	public static void printReservationOption(ReservationOption option, String seatPreference) {
 		Flight flight;
 		for(int j = 0; j < option.getNumFlights(); j++){
@@ -43,7 +54,9 @@ public class ConsoleUI {
 		System.out.println("\tTotal Travel Time: "+option.getTotalTime());
 		System.out.println("\tTotal Price: $"+String.format( "%.2f", option.getPrice(seatPreference) ));
 	}
-
+	/**
+	 * prints an invalid selection message and pauses for client to see it
+	 */
 	public static void printInvalidSelection() {
 		System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
 		System.out.println("!!!!!!  Invalid Selection  !!!!!!");
@@ -54,13 +67,20 @@ public class ConsoleUI {
 			e.printStackTrace();
 		}
 	}
-
+	/**
+	 * prints an invalid format message and pauses for client to see it
+	 */
 	public static void printInvalidFormat() {
 		System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
 		System.out.println("!!!!!!    Invalid Format   !!!!!!");
 		System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
 	}
-
+	/**
+	 * checks the input string to see if client wants to exit the program
+	 * 
+	 * @param input string contains the console input from the client
+	 * 
+	 */
 	public static void exitCheck(String input) {
 		if(input.equals(quitKeyword)) {
 			System.out.println("Exiting");
@@ -68,7 +88,12 @@ public class ConsoleUI {
 		}
 		return;
 	}
-
+	/**
+	 * parses the input string for integers and handles errors
+	 * 
+	 * @param input string contains the console input from the client
+	 * 
+	 */
 	public static int parseSelectionInt(String input) {
 		int selection = 0;
 		try {
@@ -81,7 +106,14 @@ public class ConsoleUI {
 		}
 		return selection;
 	}
-
+	/**
+	 * sorts the reservation to be displayed in order for a client
+	 * 
+	 * @param options contains the ReservationOption array return from Search
+	 * @param op string contains a sort request type
+	 * @param seatPref string contains the seating preference for sorting price by
+	 * 
+	 */
 	public static void sortReservationOptions(ArrayList<ReservationOption> options, String op, String seatPref)
 	{
 		FlightSearchSorter sorter = new FlightSearchSorter();
@@ -97,7 +129,10 @@ public class ConsoleUI {
 			printInvalidSelection();
 		}
 	}
-
+	/**
+	 * main runner function to take user input, search for flights, and display options
+	 * 
+	 */
 	public static void main(String[] args) throws ParseException {
 
 		String mDepartureAirportCode = "";
