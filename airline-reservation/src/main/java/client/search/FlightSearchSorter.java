@@ -77,37 +77,30 @@ public class FlightSearchSorter {
 		//We could use int or double here, IDC.  Used LONG because that is technically what timeUnit uses.
 		long hours = 0;
 		long minutes = 0;
-		long seconds = 0;
 		String totalTime = resOptions.get(0).getTotalTime();
-		getTimeValues(totalTime, hours, minutes, seconds);
+		getTimeValues(totalTime, hours, minutes);
 
 		for (ReservationOption resOption: resOptions) {
 			String resTotalTime = resOption.getTotalTime();
 			long resHours = 0;
 			long resMinutes = 0;
-			long resSeconds = 0;
-			getTimeValues(resTotalTime, resHours, resMinutes, resSeconds);
+			getTimeValues(resTotalTime, resHours, resMinutes);
 
 			if (resHours < hours) {
 				fastestRes = resOption;
 			} else if (resHours == hours) {
 				if (resMinutes < minutes){
 					fastestRes = resOption;
-				} else if (resMinutes == minutes) {
-					if (resSeconds < seconds) {
-						fastestRes = resOption;
-					}
 				}
 			}
 		}
 		return fastestRes;
 	}
 	
-	private void getTimeValues(String totalTime, long hours, long minutes, long seconds) {
+	private void getTimeValues(String totalTime, long hours, long minutes) {
 		String[] timeValues = totalTime.split(":");
 		hours = Long.parseLong(timeValues[0]);
 		minutes = Long.parseLong(timeValues[1]);
-		seconds = Long.parseLong(timeValues[2]);
 	}
 	
 }
