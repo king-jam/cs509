@@ -18,7 +18,7 @@ public class FlightSearchSorter {
 			boolean ascending,
 			ArrayList<ReservationOption> resOptions,
 			String seatType) {
-		
+
 		if(seatType.equals("firstclass")) {
 			Collections.sort(resOptions, new PriceComparatorFirstClass());
 		} else if(seatType.equals("coach")) {
@@ -31,7 +31,7 @@ public class FlightSearchSorter {
 	
 	public void sortTime(boolean ascending, ArrayList<ReservationOption> resOptions) {
 		Collections.sort(resOptions, new TimeComparator());
-		if (!ascending) {	
+		if (!ascending) {
 			Collections.reverse(resOptions);
 		}
 	}
