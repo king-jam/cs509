@@ -25,7 +25,7 @@ import java.util.concurrent.TimeUnit;
 public class ReservationOption {
 
 	/**
-	 * Data attributes for an ReservationOption
+	 * Data attributes for a ReservationOption
 	 */
 	private ArrayList<Flight> flightList;
 	
