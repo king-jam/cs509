@@ -15,16 +15,25 @@ import client.reservation.*;
  */
 public class FlightSearchSorter {
 	
-	public ArrayList<ReservationOption> sortPrice(boolean ascending, ArrayList<ReservationOption> resOptions) {
+	public ArrayList<ReservationOption> sortAllClassPrice(boolean ascending, boolean classOption, ArrayList<ReservationOption> resOptions) {
 		ArrayList<ReservationOption> sortedReservations = new ArrayList<ReservationOption>();
 		
-		for (ReservationOption resOption : resOptions) {
-			ReservationOption cheapestReservation = cheapestReservation(resOptions);
-			sortedReservations.add(cheapestReservation);
-			resOptions.remove(resOption);
+		if (classOption) {
+			for (ReservationOption resOption : resOptions) {
+				ReservationOption cheapestReservation = cheapestFCReservation(resOptions);
+				sortedReservations.add(cheapestReservation);
+				resOptions.remove(resOption);
+			}
+			} else {
+				for (ReservationOption resOption : resOptions) {
+					ReservationOption cheapestReservation = cheapestCCReservation(resOptions);
+					sortedReservations.add(cheapestReservation);
+					resOptions.remove(resOption);
+			}
 		}
 		if (!ascending) {
 			Collections.reverse(sortedReservations);
+			
 		}
 		return sortedReservations;
 	}
@@ -43,11 +52,22 @@ public class FlightSearchSorter {
 		return sortedReservations;
 	}
 	
-	public ReservationOption cheapestReservation(ArrayList<ReservationOption> resOptions) {
+	public ReservationOption cheapestFCReservation(ArrayList<ReservationOption> resOptions) {
 		ReservationOption cheapestRes = resOptions.get(0);
 		for (ReservationOption resOption: resOptions) {
 			//TODO: need to consider coach seating
 			if (resOption.getPrice(true) < cheapestRes.getPrice(true)) {
+				cheapestRes = resOption;
+			}
+		}
+		return cheapestRes;
+	}
+	
+	public ReservationOption cheapestCCReservation(ArrayList<ReservationOption> resOptions) {
+		ReservationOption cheapestRes = resOptions.get(0);
+		for (ReservationOption resOption: resOptions) {
+			//TODO: need to consider coach seating
+			if (resOption.getPrice(false) < cheapestRes.getPrice(false)) {
 				cheapestRes = resOption;
 			}
 		}
@@ -92,6 +112,4 @@ public class FlightSearchSorter {
 		seconds = Long.parseLong(timeValues[2]);
 	}
 	
-
-
 }
