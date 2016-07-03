@@ -55,8 +55,7 @@ public class FlightSearchSorter {
 	public ReservationOption cheapestFCReservation(ArrayList<ReservationOption> resOptions) {
 		ReservationOption cheapestRes = resOptions.get(0);
 		for (ReservationOption resOption: resOptions) {
-			//TODO: need to consider coach seating
-			if (resOption.getPrice(true) < cheapestRes.getPrice(true)) {
+			if (resOption.getPrice("firstclass") < cheapestRes.getPrice("firstclass")) {
 				cheapestRes = resOption;
 			}
 		}
@@ -66,8 +65,7 @@ public class FlightSearchSorter {
 	public ReservationOption cheapestCCReservation(ArrayList<ReservationOption> resOptions) {
 		ReservationOption cheapestRes = resOptions.get(0);
 		for (ReservationOption resOption: resOptions) {
-			//TODO: need to consider coach seating
-			if (resOption.getPrice(false) < cheapestRes.getPrice(false)) {
+			if (resOption.getPrice("coachclass") < cheapestRes.getPrice("coachclass")) {
 				cheapestRes = resOption;
 			}
 		}
@@ -76,7 +74,7 @@ public class FlightSearchSorter {
 	
 	public ReservationOption fastestReservation(ArrayList<ReservationOption> resOptions) {
 		ReservationOption fastestRes = resOptions.get(0);
-		//We could use int or double here, IDC.  Used LONG because thatis technically what timeUnit uses.
+		//We could use int or double here, IDC.  Used LONG because that is technically what timeUnit uses.
 		long hours = 0;
 		long minutes = 0;
 		long seconds = 0;

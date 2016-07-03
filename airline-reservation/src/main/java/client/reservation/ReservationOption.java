@@ -2,11 +2,12 @@ package client.reservation;
 
 import client.flight.*;
 
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
 public class ReservationOption {
@@ -37,6 +38,10 @@ public class ReservationOption {
 		this(flightOne,null,null);
 	}
 	
+	public ReservationOption(ArrayList<Flight> flightList) {
+		this.flightList = flightList;
+	}
+
 	public Flight getFlight(int index) {
 		Flight flight;
 		try {
@@ -47,6 +52,14 @@ public class ReservationOption {
 		return flight;
 	}
 	
+	public int getNumFlights() {
+		try {
+			return this.flightList.size();
+		} catch (Exception ex) {
+			return 0;
+		}
+	}
+	
 	public int getNumLayovers() {
 		try {
 			return this.flightList.size()-1;
@@ -55,16 +68,22 @@ public class ReservationOption {
 		}
 	}
 	
-	public double getPrice(boolean firstClass) {
+	public double getPrice(String seatPreference) {
 		double totalPrice = 0.0;
+		boolean firstClass = false;
+		if(seatPreference.equals("firstclass")) {
+			firstClass = true;
+		} else {
+			firstClass = false;
+		}
 		for (Flight temp : this.flightList) {
 			if(firstClass) {
 				String price = temp.getmPriceFirstclass();
-				price = price.substring(1, price.length()-1);
+				price = price.substring(1, price.length());
 				totalPrice += Double.parseDouble(price);
 			} else {
 				String price = temp.getmPriceCoach();
-				price = price.substring(1, price.length()-1);
+				price = price.substring(1, price.length());
 				totalPrice += Double.parseDouble(price);
 			}
 		}
@@ -72,23 +91,22 @@ public class ReservationOption {
 	}
 	
 	public String getTotalTime() {
-		DateFormat flightDateFormat = new SimpleDateFormat("YYYY MMM DD HH:mm Z");
+		DateTimeFormatter flightDateFormat = DateTimeFormatter.ofPattern("yyyy MMM d H:m z");
 		long totalTime = 0;
 		try {
-			for(Flight temp : this.flightList) {
-				Date departTime = new Date();
-				Date arrivalTime = new Date();
-				departTime = flightDateFormat.parse(temp.getmTimeDepart());
-				arrivalTime = flightDateFormat.parse(temp.getmTimeArrival());
-				totalTime += arrivalTime.getTime() - departTime.getTime();
-			}
-		} catch (ParseException ex) {
+			LocalDateTime departTimeLocal = LocalDateTime.parse(this.getFlight(0).getmTimeDepart(),flightDateFormat);
+			ZonedDateTime departTimeZoned = departTimeLocal.atZone(ZoneId.of("GMT"));
+			long departTime = departTimeZoned.toInstant().toEpochMilli();
+			LocalDateTime arrivalTimeLocal = LocalDateTime.parse(this.getFlight(this.getNumFlights()-1).getmTimeArrival(), flightDateFormat);
+			ZonedDateTime arrivalTimeZoned = arrivalTimeLocal.atZone(ZoneId.of("GMT"));
+			long arrivalTime = arrivalTimeZoned.toInstant().toEpochMilli();
+			totalTime = arrivalTime - departTime;
+		} catch (DateTimeParseException ex) {
 			ex.printStackTrace();
 		}
-		return String.format("%02d:%02d:%02d",
+		return String.format("%02d:%02d",
 				TimeUnit.MILLISECONDS.toHours(totalTime),
-				TimeUnit.MILLISECONDS.toMinutes(totalTime) % TimeUnit.HOURS.toMinutes(1),
-				TimeUnit.MILLISECONDS.toSeconds(totalTime) % TimeUnit.MINUTES.toSeconds(1)
+				TimeUnit.MILLISECONDS.toMinutes(totalTime) % TimeUnit.HOURS.toMinutes(1)
 				);
 	}
 }

@@ -3,34 +3,46 @@
  */
 package client.driver;
 
+import client.reservation.*;
 import java.text.ParseException;
 import java.util.ArrayList;
 
-import client.dao.ServerInterface;
 import client.flight.Flight;
-import client.flight.Flights;
 import client.search.*;
 
-
-/**
- * @author blake
- *
- */
 public class Driver {
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		FlightSearch search=new FlightSearch("BOS","LGA",true,"firstclass","2016 May 10 00:05 GMT","2016 May 10 00:30 GMT");
+		FlightSearch search=new FlightSearch("BOS","LGA","2016 May 10 00:05 GMT","firstclass");
 		try {
-			ArrayList<ReservationOptionDummy> ar =search.getOptions();
-			System.out.println(ar.size());
+			ArrayList<ReservationOption> ar =search.getOptions();
+			Flight flight;
+			for(ReservationOption reservation:ar ){
+				System.out.println("---------------------------");
+				for(int i=0;i<3;i++){
+					flight=reservation.getFlight(i);
+					if(flight==null)
+						break;
+					else{
+						System.out.println(flight.getmAirplane()+" "+flight.getmNumber()+" "+
+								flight.getmCodeDepart()+"--->"+flight.getmCodeArrival());
+						System.out.println("Departure:"+flight.getmTimeDepart()+" Arrival:"+flight.getmTimeArrival());
+						System.out.println();	
+					}
+						
+					
+				}
+				System.out.println("---------------------------");
+			}
+			
 			
 		} catch (ParseException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		System.out.println("done");
+
 
 		/*ServerInterface resSys = new ServerInterface();
 		
