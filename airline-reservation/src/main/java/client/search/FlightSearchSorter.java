@@ -7,7 +7,6 @@ import client.reservation.*;
 
 /**
  * This class performs sort based on reservation options 
- * We didn't implement Compareable, so we have to do this all manually
  * 
  * @author Forkey
  * @version 1
@@ -15,92 +14,25 @@ import client.reservation.*;
  */
 public class FlightSearchSorter {
 	
-	public ArrayList<ReservationOption> sortAllClassPrice(boolean ascending, boolean classOption, ArrayList<ReservationOption> resOptions) {
-		ArrayList<ReservationOption> sortedReservations = new ArrayList<ReservationOption>();
-		
-		if (classOption) {
-			for (ReservationOption resOption : resOptions) {
-				ReservationOption cheapestReservation = cheapestFCReservation(resOptions);
-				sortedReservations.add(cheapestReservation);
-				resOptions.remove(resOption);
-			}
-			} else {
-				for (ReservationOption resOption : resOptions) {
-					ReservationOption cheapestReservation = cheapestCCReservation(resOptions);
-					sortedReservations.add(cheapestReservation);
-					resOptions.remove(resOption);
-			}
+	public void sortPrice(
+			boolean ascending,
+			ArrayList<ReservationOption> resOptions,
+			String seatType) {
+
+		if(seatType.equals("firstclass")) {
+			Collections.sort(resOptions, new PriceComparatorFirstClass());
+		} else if(seatType.equals("coach")) {
+			Collections.sort(resOptions, new PriceComparatorCoach());
 		}
 		if (!ascending) {
-			Collections.reverse(sortedReservations);
-			
+			Collections.reverse(resOptions);
 		}
-		return sortedReservations;
 	}
 	
-	public ArrayList<ReservationOption> sortTime(boolean ascending, ArrayList<ReservationOption> resOptions) {
-		ArrayList<ReservationOption> sortedReservations = new ArrayList<ReservationOption>();
-		
-		for (ReservationOption resOption : resOptions) {
-			ReservationOption fastestReservation = fastestReservation(resOptions);
-			sortedReservations.add(fastestReservation);
-			resOptions.remove(resOption);
+	public void sortTime(boolean ascending, ArrayList<ReservationOption> resOptions) {
+		Collections.sort(resOptions, new TimeComparator());
+		if (!ascending) {
+			Collections.reverse(resOptions);
 		}
-		if (!ascending) {	
-			Collections.reverse(sortedReservations);
-		}
-		return sortedReservations;
 	}
-	
-	public ReservationOption cheapestFCReservation(ArrayList<ReservationOption> resOptions) {
-		ReservationOption cheapestRes = resOptions.get(0);
-		for (ReservationOption resOption: resOptions) {
-			if (resOption.getPrice("firstclass") < cheapestRes.getPrice("firstclass")) {
-				cheapestRes = resOption;
-			}
-		}
-		return cheapestRes;
-	}
-	
-	public ReservationOption cheapestCCReservation(ArrayList<ReservationOption> resOptions) {
-		ReservationOption cheapestRes = resOptions.get(0);
-		for (ReservationOption resOption: resOptions) {
-			if (resOption.getPrice("coachclass") < cheapestRes.getPrice("coachclass")) {
-				cheapestRes = resOption;
-			}
-		}
-		return cheapestRes;
-	}
-	
-	public ReservationOption fastestReservation(ArrayList<ReservationOption> resOptions) {
-		ReservationOption fastestRes = resOptions.get(0);
-		//We could use int or double here, IDC.  Used LONG because that is technically what timeUnit uses.
-		long hours = 0;
-		long minutes = 0;
-		String totalTime = resOptions.get(0).getTotalTime();
-		getTimeValues(totalTime, hours, minutes);
-
-		for (ReservationOption resOption: resOptions) {
-			String resTotalTime = resOption.getTotalTime();
-			long resHours = 0;
-			long resMinutes = 0;
-			getTimeValues(resTotalTime, resHours, resMinutes);
-
-			if (resHours < hours) {
-				fastestRes = resOption;
-			} else if (resHours == hours) {
-				if (resMinutes < minutes){
-					fastestRes = resOption;
-				}
-			}
-		}
-		return fastestRes;
-	}
-	
-	private void getTimeValues(String totalTime, long hours, long minutes) {
-		String[] timeValues = totalTime.split(":");
-		hours = Long.parseLong(timeValues[0]);
-		minutes = Long.parseLong(timeValues[1]);
-	}
-	
 }
