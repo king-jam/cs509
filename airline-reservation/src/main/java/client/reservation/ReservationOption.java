@@ -34,8 +34,8 @@ public class ReservationOption {
 	 * 
 	 * The default constructor initializes the object instance to default / invalid values.
 	 * 
-	 * @precondition none
-	 * @postcondition attributes are initialized with valid structures 
+	 * precondition none
+	 * postcondition attributes are initialized with valid structures 
 	 */
 	public ReservationOption() {
 		this.flightList = new ArrayList<Flight>();
@@ -51,8 +51,8 @@ public class ReservationOption {
 	 * @param flightTwo is the second flight
 	 * @param flightThree is the third flight
 	 * 
-	 * @precondition valid flights
-	 * @postcondition attributes are initialized with valid values 
+	 * precondition valid flights
+	 * postcondition attributes are initialized with valid values 
 	 */
 	public ReservationOption(
 			Flight flightOne,
@@ -79,8 +79,8 @@ public class ReservationOption {
 	 * @param flightOne is the first flight
 	 * @param flightTwo is the second flight
 	 * 
-	 * @precondition valid flights
-	 * @postcondition attributes are initialized with valid values 
+	 * precondition valid flights
+	 * postcondition attributes are initialized with valid values 
 	 */
 	public ReservationOption(Flight flightOne, Flight flightTwo) {
 		this(flightOne, flightTwo, null);
@@ -94,8 +94,8 @@ public class ReservationOption {
 	 * 
 	 * @param flightOne is the first flight
 	 * 
-	 * @precondition valid flights
-	 * @postcondition attributes are initialized with valid values 
+	 * precondition valid flights
+	 * postcondition attributes are initialized with valid values 
 	 */
 	public ReservationOption(Flight flightOne) {
 		this(flightOne,null,null);
@@ -108,8 +108,8 @@ public class ReservationOption {
 	 * 
 	 * @param flightList is a list of flights that make up the option.
 	 * 
-	 * @precondition valid flights
-	 * @postcondition attributes are initialized with valid values 
+	 * precondition valid flights
+	 * postcondition attributes are initialized with valid values 
 	 */
 	public ReservationOption(ArrayList<Flight> flightList) {
 		this.flightList = flightList;
@@ -117,6 +117,8 @@ public class ReservationOption {
 	/**
 	 * get an individual Flight from the ArrayList based on index
 	 * aligns with which leg of the overall trip (layovers)
+	 * 
+	 * @param index of Flight in list
 	 * 
 	 * @return the Flight object at the index
 	 */
