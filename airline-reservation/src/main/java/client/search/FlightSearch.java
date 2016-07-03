@@ -56,7 +56,7 @@ public class FlightSearch {
 	 * This method converts a date string from "yyyy MMM dd HH:mm z" format to "yyyy_MM_dd" format.
 	 * 
 	 * @param date represents the string in "yyyy MMM dd HH:mm z" format.
-	 * @return string in "yyyy_MM_dd"
+	 * @return string in "yyyy_MM_dd" format.
 	 * @throws ParseException
 	 */
 	public String dateFormatter(String date) throws ParseException{
@@ -73,7 +73,7 @@ public class FlightSearch {
 	 * 
 	 * @param arrivalTime represents the string in "yyyy MMM dd HH:mm z" format.
 	 * @param departureTime represents the string in "yyyy MMM dd HH:mm z" format.
-	 * @return
+	 * @return true if arrivalTime>departurTime else false
 	 * @throws ParseException
 	 */
 	public boolean checkDepartureTime(String arrivalTime,String departureTime) throws ParseException{
@@ -126,7 +126,7 @@ public class FlightSearch {
 	 * This method checks for the constraint that the layover_time >= 30min and layover_time<=3hrs.
 	 * The above constraint is verified for connecting flights
 	 * @param arrivalTime represents the arrival time of a flight in "yyyy MMM dd HH:mm z" string format.
-	 * @param departureTime represents the departure time of a flight in "yyyy MMM dd HH:mm z" string format.
+	 * @param departureTime represents the departure time of a connecting flight in "yyyy MMM dd HH:mm z" string format.
 	 * @return true if constraint is followed else returns false.
 	 * @throws ParseException
 	 */
