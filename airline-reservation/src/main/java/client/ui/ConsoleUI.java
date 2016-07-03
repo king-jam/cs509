@@ -85,20 +85,15 @@ public class ConsoleUI {
 	public static void sortReservationOptions(ArrayList<ReservationOption> options, String op, String seatPref)
 	{
 		FlightSearchSorter sorter = new FlightSearchSorter();
-		switch(op) {
-		case "pa":
+		if(op.equals("pa")) {
 			sorter.sortPrice(true,options,seatPref);
-			break;
-		case "pd":
+		} else if (op.equals("pd")) {
 			sorter.sortPrice(false,options,seatPref);
-			break;
-		case "ta":
+		} else if (op.equals("ta")) {
 			sorter.sortTime(true,options);
-			break;
-		case "td":
+		} else if (op.equals("td")) {
 			sorter.sortTime(false,options);
-			break;
-		default:
+		} else {
 			printInvalidSelection();
 		}
 	}
