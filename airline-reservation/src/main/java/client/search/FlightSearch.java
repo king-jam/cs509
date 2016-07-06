@@ -2,13 +2,16 @@ package client.search;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
+import java.util.Queue;
 import java.util.Date;
 import java.util.TimeZone;
 import java.util.Calendar;
+import java.util.HashMap;
 
-import client.dao.ServerInterface;
+import client.dao.ServerInterfaceCache;
 import client.flight.*;
 import client.util.*;
 import client.reservation.*;
@@ -30,7 +33,7 @@ public class FlightSearch {
 	private String mDepartureDate;
 	private String mSeatPreference;
 	private String mTicketAgency;
-	private ServerInterface mServerInterface;
+	private ServerInterfaceCache mServerInterface;
 	
 	/**
 	 * Constructor
@@ -49,7 +52,7 @@ public class FlightSearch {
 		this.mDepartureDate = departuredate;
 		this.mSeatPreference = seatPreference;
 		this.mTicketAgency=Configuration.getAgency();
-		this.mServerInterface=new ServerInterface();
+		this.mServerInterface=new ServerInterfaceCache();		
 	}
 	
 	/**
@@ -152,6 +155,8 @@ public class FlightSearch {
 	 * @param flights is of the type {@link client.flight.Flights} to hold Flight objects({@link client.flight.Flight}).
 	 */
 	public void addFlights(String airportCode,String departuredate,Flights flights){
+		System.out.print(airportCode+" ");
+		System.out.println(departuredate);
 		String xmlFlightData=mServerInterface.getFlights(mTicketAgency,
 				airportCode,departuredate);
 		flights.addAll(xmlFlightData);
@@ -168,7 +173,7 @@ public class FlightSearch {
 	    	clone.add(item);
 	    return clone;
 	}
-	
+  
 	/**
 	 * This method uses the search parameters to search for valid flights 
 	 * @return an arrayList of the type {@link client.reservation.ReservationOption}
@@ -181,11 +186,12 @@ public class FlightSearch {
 		Flights firstOutboundflights=new Flights();
 		Flights secondOutboundflights=new Flights();
 		Flights thirdOutboundflights=new Flights();
-
+		HashMap<String, Boolean> hMap = new HashMap<String, Boolean>();
+		
+		hMap.put(this.mDepartureAirportCode, true);
 		addFlights(this.mDepartureAirportCode,dateFormatter(this.mDepartureDate),firstOutboundflights);
 
 		for(Flight flight:firstOutboundflights){
-			
 			// eliminate all flights without seats for our seat type
 			if(mSeatPreference.equals("firstclass")) {
 				if(flight.getmSeatsFirstclass() == 0) {
@@ -197,12 +203,22 @@ public class FlightSearch {
 				}
 			}
 			
+			
 			//determining flight with no layover
 			if(flight.getmCodeArrival().equals(this.mArrivalAirportCode)){
 				reservedflights.add(flight);
 				reservedOptions.add(new ReservationOption(cloneList(reservedflights)));
 				reservedflights.clear();	
 			} else {
+					boolean val = false;
+					try {
+						val = hMap.get(flight.getmCodeArrival());
+					} catch (NullPointerException e) {
+						hMap.put(flight.getmCodeArrival(), true);
+					}
+					if(val) {
+						continue;
+					}
 				    addFlights(flight.getmCodeArrival(),dateFormatter(flight.getmTimeArrival()),secondOutboundflights);
 				    if(checkNextDayFlight(flight.getmTimeArrival())){
 				    	addFlights(flight.getmCodeArrival(),dateFormatter(addOneday(flight.getmTimeArrival())),secondOutboundflights);
@@ -221,7 +237,15 @@ public class FlightSearch {
 							}
 						}
 						else{
-							
+							val = false;
+							try {
+								val = hMap.get(flight.getmCodeArrival());
+							} catch (NullPointerException e) {
+								hMap.put(flight.getmCodeArrival(), true);
+							}
+							if(val) {
+								continue;
+							}
 							addFlights(firstLayoverFlight.getmCodeArrival(),dateFormatter(firstLayoverFlight.getmTimeArrival()),thirdOutboundflights);
 							
 							if(checkNextDayFlight(firstLayoverFlight.getmTimeArrival())){
