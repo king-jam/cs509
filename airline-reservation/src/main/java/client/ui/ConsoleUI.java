@@ -15,7 +15,7 @@ import java.util.concurrent.TimeUnit;
 
 import client.airport.Airport;
 import client.airport.Airports;
-import client.dao.ServerInterface;
+import client.dao.*;
 import client.flight.Flight;
 import client.reservation.*;
 import client.search.FlightSearch;
@@ -142,7 +142,7 @@ public class ConsoleUI {
 		String mDepartureDate = "";
 		String mReturnDate = "";
 		ArrayList<ReservationOption> selectedOptions = new ArrayList<ReservationOption>();
-		ServerInterface mServerInterface = new ServerInterface();
+		ServerInterfaceCache mServerInterface = ServerInterfaceCache.getInstance();
 		Airports airports = new Airports();
 		String airportData = mServerInterface.getAirports(Configuration.getAgency());
 		airports.addAll(airportData);
@@ -166,191 +166,149 @@ public class ConsoleUI {
 		} catch(InterruptedException e) {
 			e.printStackTrace();
 		}
-		while(!inputReady) {
-			boolean depAirport = false;
-			while(!depAirport) {
-				System.out.println("\tDEPARTURE AIRPORTS");
-				for(int i = 0; i < airports.size(); i++) {
-					System.out.printf("%d:\t%s\t%s\n",i+1,airports.get(i).code(),airports.get(i).name());
-				}
-				System.out.print("Please select a DEPARTURE airport [enter #]: ");
-				String input = scan.next();
-				exitCheck(input);
-				int selection = parseSelectionInt(input);
-				if(selection < 0 || selection > airports.size()) {
-					printInvalidSelection();
-				} else {
-					depAirport = true;
-					mDepartureAirportCode = airports.get(selection-1).code();
-				}
-			}
-			boolean arrAirport = false;
-			while(!arrAirport) {
-				System.out.println("\tARRIVAL AIRPORTS");
-				for(int i = 0; i < airports.size(); i++) {
-					System.out.printf("%d:\t%s\t%s\n",i+1,airports.get(i).code(),airports.get(i).name());
-				}
-				System.out.print("Please select a ARRIVAL airport [enter #]: ");
-				String input = scan.next();
-				exitCheck(input);
-				int selection = parseSelectionInt(input);
-				if(selection < 0 || selection > airports.size()) {
-					printInvalidSelection();
-				} else {
-					arrAirport = true;
-					mArrivalAirportCode = airports.get(selection-1).code();
-				}
-			}
-			boolean oneWaySelection = false;
-			while(!oneWaySelection) {
-				System.out.print("Is the flight one way [y/n]: ");
-				String input = scan.next();
-				exitCheck(input);
-				if(input.equals("y") || input.equals("Y")) {
-					mOneWay = true;
-					oneWaySelection = true;
-				} else if(input.equals("n") || input.equals("N")) {
-					mOneWay = false;
-					oneWaySelection = true;
-				} else {
-					printInvalidSelection();
-				}
-			}
-			boolean seatPref = false;
-			while(!seatPref) {
-				System.out.println("\tSEAT PREFERENCE");
-				System.out.printf("\t1 - Coach\n");
-				System.out.printf("\t2 - First Class\n");
-				System.out.print("Please select seat preference [enter #]: ");
-				String input = scan.next();
-				exitCheck(input);
-				int selection = parseSelectionInt(input);
-				if(selection < 1 || selection > 2) {
-					printInvalidSelection();
-				} else {
-					seatPref = true;
-					if(selection == 1) {
-						mSeatPreference = "coach";
+		boolean retry = false;
+		while(!retry) {
+			while(!inputReady) {
+				boolean depAirport = false;
+				while(!depAirport) {
+					System.out.println("\tDEPARTURE AIRPORTS");
+					for(int i = 0; i < airports.size(); i++) {
+						System.out.printf("%d:\t%s\t%s\n",i+1,airports.get(i).code(),airports.get(i).name());
+					}
+					System.out.print("Please select a DEPARTURE airport [enter #]: ");
+					String input = scan.next();
+					exitCheck(input);
+					int selection = parseSelectionInt(input);
+					if(selection < 0 || selection > airports.size()) {
+						printInvalidSelection();
 					} else {
-						mSeatPreference = "firstclass";
+						depAirport = true;
+						mDepartureAirportCode = airports.get(selection-1).code();
 					}
 				}
-			}
-			boolean depDate = false;
-			while(!depDate) {
-				System.out.print("Please enter DEPARTURE date [format - 2016 May 10 15:25 (use 24hr time)]:");
-				String in1 = scan.next();
-				String in2 = scan.nextLine();
-				String departDate = in1 + in2 + " GMT";
-				exitCheck(departDate);
-				DateTimeFormatter flightDateFormat= DateTimeFormatter.ofPattern("yyyy MMM d H:m z");
-				try {
-					@SuppressWarnings("unused")
-					LocalDateTime departTimeLocal = LocalDateTime.parse(departDate,flightDateFormat);
-				} catch (DateTimeParseException e) {
-					printInvalidFormat();
-					break;
+				boolean arrAirport = false;
+				while(!arrAirport) {
+					System.out.println("\tARRIVAL AIRPORTS");
+					for(int i = 0; i < airports.size(); i++) {
+						System.out.printf("%d:\t%s\t%s\n",i+1,airports.get(i).code(),airports.get(i).name());
+					}
+					System.out.print("Please select a ARRIVAL airport [enter #]: ");
+					String input = scan.next();
+					exitCheck(input);
+					int selection = parseSelectionInt(input);
+					if(selection < 0 || selection > airports.size()) {
+						printInvalidSelection();
+					} else {
+						arrAirport = true;
+						mArrivalAirportCode = airports.get(selection-1).code();
+					}
 				}
-				depDate = true;
-				mDepartureDate = departDate;
-			}
-			if(!mOneWay) {
-				boolean retDate = false;
-				while(!retDate) {
-					System.out.print("Please enter RETURN date [format - 2016 May 10 15:25 (use 24hr time)]:");
+				boolean oneWaySelection = false;
+				while(!oneWaySelection) {
+					System.out.print("Is the flight one way [y/n]: ");
+					String input = scan.next();
+					exitCheck(input);
+					if(input.equals("y") || input.equals("Y")) {
+						mOneWay = true;
+						oneWaySelection = true;
+					} else if(input.equals("n") || input.equals("N")) {
+						mOneWay = false;
+						oneWaySelection = true;
+					} else {
+						printInvalidSelection();
+					}
+				}
+				boolean seatPref = false;
+				while(!seatPref) {
+					System.out.println("\tSEAT PREFERENCE");
+					System.out.printf("\t1 - Coach\n");
+					System.out.printf("\t2 - First Class\n");
+					System.out.print("Please select seat preference [enter #]: ");
+					String input = scan.next();
+					exitCheck(input);
+					int selection = parseSelectionInt(input);
+					if(selection < 1 || selection > 2) {
+						printInvalidSelection();
+					} else {
+						seatPref = true;
+						if(selection == 1) {
+							mSeatPreference = "coach";
+						} else {
+							mSeatPreference = "firstclass";
+						}
+					}
+				}
+				boolean depDate = false;
+				while(!depDate) {
+					System.out.print("Please enter DEPARTURE date [format - 2016 May 10 15:25 (use 24hr time)]:");
 					String in1 = scan.next();
 					String in2 = scan.nextLine();
-					String returnDate = in1 + in2 + " GMT";
-					exitCheck(returnDate);
+					String departDate = in1 + in2 + " GMT";
+					exitCheck(departDate);
 					DateTimeFormatter flightDateFormat= DateTimeFormatter.ofPattern("yyyy MMM d H:m z");
 					try {
 						@SuppressWarnings("unused")
-						LocalDateTime departTimeLocal = LocalDateTime.parse(returnDate,flightDateFormat);
+						LocalDateTime departTimeLocal = LocalDateTime.parse(departDate,flightDateFormat);
 					} catch (DateTimeParseException e) {
 						printInvalidFormat();
 						break;
 					}
-					retDate = true;
-					mReturnDate = returnDate;
+					depDate = true;
+					mDepartureDate = departDate;
 				}
+				if(!mOneWay) {
+					boolean retDate = false;
+					while(!retDate) {
+						System.out.print("Please enter RETURN date [format - 2016 May 10 15:25 (use 24hr time)]:");
+						String in1 = scan.next();
+						String in2 = scan.nextLine();
+						String returnDate = in1 + in2 + " GMT";
+						exitCheck(returnDate);
+						DateTimeFormatter flightDateFormat= DateTimeFormatter.ofPattern("yyyy MMM d H:m z");
+						try {
+							@SuppressWarnings("unused")
+							LocalDateTime departTimeLocal = LocalDateTime.parse(returnDate,flightDateFormat);
+						} catch (DateTimeParseException e) {
+							printInvalidFormat();
+							break;
+						}
+						retDate = true;
+						mReturnDate = returnDate;
+					}
+				}
+				inputReady = true;
 			}
-			inputReady = true;
-		}
-		ArrayList<ReservationOption> toOptions = new ArrayList<ReservationOption>();
-		FlightSearch search=new FlightSearch(
-				mDepartureAirportCode,
-				mArrivalAirportCode,
-				mDepartureDate,
-				mSeatPreference);
-		try {
-			System.out.println("!!!!!!!!SEARCHING!!!!!!!!!!!");
-			toOptions = search.getOptions();
-		} catch (ParseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		if(toOptions.isEmpty()) {
-			System.out.println("No Flights to Destination, please change date");
-			exitCheck("q");
-		}
-		boolean selectedToReservation = false;
-		while(!selectedToReservation) {
-			System.out.println("Flight Options TO Destination");
-			for(int i = 0; i < toOptions.size(); i++){
-				ReservationOption option = toOptions.get(i);
-				System.out.printf("%d.\t---------------------------------"
-						+ "------------------------------------\n",i+1);
-				printReservationOption(option, mSeatPreference);
-			}
-
-			System.out.print("Please select a reservation option or display mechanism [enter #/pa/pd/ta/td]: ");
-			String input = scan.next();
-			exitCheck(input);
-			if(input.equals("pa") ||
-					input.equals("pd") ||
-					input.equals("ta") ||
-					input.equals("td"))
-			{
-				sortReservationOptions(toOptions, input, mSeatPreference);
-				continue;
-			}
-			int selection = parseSelectionInt(input);
-			if(selection < 0 || selection > toOptions.size()) {
-				printInvalidSelection();
-			} else {
-				selectedToReservation = true;
-				selectedOptions.add(toOptions.get(selection-1));
-			}
-		}
-		if(!mOneWay) {
-			boolean selectedFromReservation = false;
-			ArrayList<ReservationOption> retOptions = new ArrayList<ReservationOption>();
-			FlightSearch search2=new FlightSearch(
-					mArrivalAirportCode, // previous arrival airport is now departure
-					mDepartureAirportCode, // previous departure airport is now arrival
-					mReturnDate, 
+			ArrayList<ReservationOption> toOptions = new ArrayList<ReservationOption>();
+			FlightSearch search=new FlightSearch(
+					mDepartureAirportCode,
+					mArrivalAirportCode,
+					mDepartureDate,
 					mSeatPreference);
 			try {
 				System.out.println("!!!!!!!!SEARCHING!!!!!!!!!!!");
-				retOptions = search2.getOptions();
+				long start = System.currentTimeMillis();
+				toOptions = search.getOptions();
+				long end = System.currentTimeMillis();
+				System.out.printf("Total Time: %d\n", end-start);
 			} catch (ParseException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			if(retOptions.isEmpty()) {
+			if(toOptions.isEmpty()) {
 				System.out.println("No Flights to Destination, please change date");
 				exitCheck("q");
 			}
-			while(!selectedFromReservation) {
+			boolean selectedToReservation = false;
+			while(!selectedToReservation) {
 				System.out.println("Flight Options TO Destination");
-				for(int i = 0; i < retOptions.size(); i++){
-					ReservationOption option = retOptions.get(i);
+				for(int i = 0; i < toOptions.size(); i++){
+					ReservationOption option = toOptions.get(i);
 					System.out.printf("%d.\t---------------------------------"
 							+ "------------------------------------\n",i+1);
 					printReservationOption(option, mSeatPreference);
 				}
-
-				System.out.print("Please select a reservation option [enter #]: ");
+	
+				System.out.print("Please select a reservation option or display mechanism [enter #/pa/pd/ta/td]: ");
 				String input = scan.next();
 				exitCheck(input);
 				if(input.equals("pa") ||
@@ -362,53 +320,105 @@ public class ConsoleUI {
 					continue;
 				}
 				int selection = parseSelectionInt(input);
-				if(selection < 0 || selection > retOptions.size()) {
+				if(selection < 0 || selection > toOptions.size()) {
 					printInvalidSelection();
 				} else {
-					selectedFromReservation = true;
-					selectedOptions.add(retOptions.get(selection-1));
+					selectedToReservation = true;
+					selectedOptions.add(toOptions.get(selection-1));
 				}
 			}
-		}
-		boolean confirmed = false;
-		while(!confirmed) {
-			if(selectedOptions.isEmpty() || (selectedOptions.size() > 2)) {
-				break;
-			}
-			// print toTrip
-			ReservationOption option = selectedOptions.get(0);
-			System.out.println("------------TO TRIP-------------");
-			printReservationOption(option, mSeatPreference);
-
-			// print returnTrip
 			if(!mOneWay) {
-				option = selectedOptions.get(1);
-				System.out.println("------------RETURN TRIP-------------");
-				printReservationOption(option, mSeatPreference);	
+				boolean selectedFromReservation = false;
+				ArrayList<ReservationOption> retOptions = new ArrayList<ReservationOption>();
+				FlightSearch search2=new FlightSearch(
+						mArrivalAirportCode, // previous arrival airport is now departure
+						mDepartureAirportCode, // previous departure airport is now arrival
+						mReturnDate, 
+						mSeatPreference);
+				try {
+					System.out.println("!!!!!!!!SEARCHING!!!!!!!!!!!");
+					long start = System.currentTimeMillis();
+					retOptions = search2.getOptions();
+					long end = System.currentTimeMillis();
+					System.out.printf("Total Time: %d\n", end-start);
+				} catch (ParseException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				if(retOptions.isEmpty()) {
+					System.out.println("No Flights to Destination, please change date");
+					exitCheck("q");
+				}
+				while(!selectedFromReservation) {
+					System.out.println("Flight Options TO Destination");
+					for(int i = 0; i < retOptions.size(); i++){
+						ReservationOption option = retOptions.get(i);
+						System.out.printf("%d.\t---------------------------------"
+								+ "------------------------------------\n",i+1);
+						printReservationOption(option, mSeatPreference);
+					}
+	
+					System.out.print("Please select a reservation option [enter #]: ");
+					String input = scan.next();
+					exitCheck(input);
+					if(input.equals("pa") ||
+							input.equals("pd") ||
+							input.equals("ta") ||
+							input.equals("td"))
+					{
+						sortReservationOptions(toOptions, input, mSeatPreference);
+						continue;
+					}
+					int selection = parseSelectionInt(input);
+					if(selection < 0 || selection > retOptions.size()) {
+						printInvalidSelection();
+					} else {
+						selectedFromReservation = true;
+						selectedOptions.add(retOptions.get(selection-1));
+					}
+				}
 			}
-			System.out.println("-----------------------------------------");
-			System.out.println("-----------RESERVATION SUMMARY-----------");
-			System.out.println("Seat Type: "+mSeatPreference);
-			double price = 0;
-			for(ReservationOption ops:selectedOptions) {
-				price += ops.getPrice(mSeatPreference);
-			}
-			System.out.println("Total Price: $"+String.format( "%.2f", price));
-
-			System.out.print("Confirm Reservation? [y/n]: ");
-			String input = scan.next();
-			if(input.equals("q")) {
-				System.out.println("Exiting");
-				System.exit(0);
-			} else {
-				if(input.equals("y") || input.equals("Y")) {
-					// reserve flights here
-					confirmed = true;
-				} else if(input.equals("n") || input.equals("N")) {
-					System.out.println("Graceful case not supported yet - restart app");
-					confirmed = true;
+			boolean confirmed = false;
+			while(!confirmed) {
+				if(selectedOptions.isEmpty() || (selectedOptions.size() > 2)) {
+					break;
+				}
+				// print toTrip
+				ReservationOption option = selectedOptions.get(0);
+				System.out.println("------------TO TRIP-------------");
+				printReservationOption(option, mSeatPreference);
+	
+				// print returnTrip
+				if(!mOneWay) {
+					option = selectedOptions.get(1);
+					System.out.println("------------RETURN TRIP-------------");
+					printReservationOption(option, mSeatPreference);	
+				}
+				System.out.println("-----------------------------------------");
+				System.out.println("-----------RESERVATION SUMMARY-----------");
+				System.out.println("Seat Type: "+mSeatPreference);
+				double price = 0;
+				for(ReservationOption ops:selectedOptions) {
+					price += ops.getPrice(mSeatPreference);
+				}
+				System.out.println("Total Price: $"+String.format( "%.2f", price));
+	
+				System.out.print("Confirm Reservation? [y/n]: ");
+				String input = scan.next();
+				if(input.equals("q")) {
+					System.out.println("Exiting");
+					System.exit(0);
 				} else {
-					printInvalidSelection();
+					if(input.equals("y") || input.equals("Y")) {
+						// reserve flights here
+						retry = true;
+						confirmed = true;
+					} else if(input.equals("n") || input.equals("N")) {
+						System.out.println("Graceful case not supported yet - restart app");
+						confirmed = true;
+					} else {
+						printInvalidSelection();
+					}
 				}
 			}
 		}

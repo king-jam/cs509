@@ -2,13 +2,18 @@ package client.search;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
-import java.util.Date;
 import java.util.TimeZone;
 import java.util.Calendar;
+import java.util.Queue;
 
-import client.dao.ServerInterface;
+import client.dao.*;
 import client.flight.*;
 import client.util.*;
 import client.reservation.*;
@@ -30,8 +35,8 @@ public class FlightSearch {
 	private String mDepartureDate;
 	private String mSeatPreference;
 	private String mTicketAgency;
-	private ServerInterface mServerInterface;
-	
+	private ServerInterfaceCache mServerInterface;
+
 	/**
 	 * Constructor
 	 * 
@@ -43,15 +48,15 @@ public class FlightSearch {
 	public FlightSearch(String departureAirportCode,
 			String arrivalAirportCode,
 			String departuredate, String seatPreference) {
-		
+
 		this.mDepartureAirportCode = departureAirportCode;
 		this.mArrivalAirportCode = arrivalAirportCode;
 		this.mDepartureDate = departuredate;
 		this.mSeatPreference = seatPreference;
 		this.mTicketAgency=Configuration.getAgency();
-		this.mServerInterface=new ServerInterface();
+		this.mServerInterface=ServerInterfaceCache.getInstance();
 	}
-	
+
 	/**
 	 * This method converts a date string from "yyyy MMM dd HH:mm z" format to "yyyy_MM_dd" format.
 	 * 
@@ -60,32 +65,14 @@ public class FlightSearch {
 	 * @throws ParseException
 	 */
 	public String dateFormatter(String date) throws ParseException{
-		
+
 		SimpleDateFormat formatter=new  SimpleDateFormat("yyyy MMM dd HH:mm z");
 		SimpleDateFormat departureDateFormatter=new  SimpleDateFormat("yyyy_MM_dd");
 		departureDateFormatter.setTimeZone(TimeZone.getTimeZone("GMT"));
 		String departuredate=departureDateFormatter.format(formatter.parse(date));
 		return departuredate;
 	}
-	
-	/**
-	 * This method checks if the arrival time of a particular flight is after the departure time of another.
-	 * 
-	 * @param arrivalTime represents the string in "yyyy MMM dd HH:mm z" format.
-	 * @param departureTime represents the string in "yyyy MMM dd HH:mm z" format.
-	 * @return true if arrivalTime>departurTime else false
-	 * @throws ParseException
-	 */
-	public boolean checkDepartureTime(String arrivalTime,String departureTime) throws ParseException{
-		SimpleDateFormat formatter=new  SimpleDateFormat("yyyy MMM dd HH:mm z");
-		Date arrival=formatter.parse(arrivalTime);
-		Date departure=formatter.parse(departureTime);
-		if(arrival.after(departure))
-			return true;
-		else
-			return false;
-	}
-	
+
 	/**
 	 * This method verifies whether a arrival time of a flight is after 9pm.
 	 * It is a constraint to check for connecting flights in the next day.
@@ -101,12 +88,12 @@ public class FlightSearch {
 		int hour=calendar.get(Calendar.HOUR_OF_DAY);
 		int minute=calendar.get(Calendar.MINUTE);
 		if((hour==Configuration.DAY_HOUR_NEXT_FLIGHT && minute>0)||(hour>Configuration.DAY_HOUR_NEXT_FLIGHT)){
-			return true;		
-		}
-		else
+			return true;
+		} else {
 			return false;
+		}
 	}
-	
+
 	/**
 	 * This method adds one day to date given as the parameter.
 	 * 
@@ -121,27 +108,50 @@ public class FlightSearch {
 		calendar.add(Calendar.DATE, 1);
 		return formatter.format(calendar.getTime());
 	}
-	
+
 	/**
-	 * This method checks for the constraint that the layover_time >= 30min and layover_time<=3hrs.
+	 * This method checks for the constraints that the layover_time >= 30min and layover_time<=3hrs.
 	 * The above constraint is verified for connecting flights
 	 * @param arrivalTime represents the arrival time of a flight in "yyyy MMM dd HH:mm z" string format.
 	 * @param departureTime represents the departure time of a connecting flight in "yyyy MMM dd HH:mm z" string format.
 	 * @return true if constraint is followed else returns false.
 	 * @throws ParseException
 	 */
-	public boolean checkLayoverTime(String arrivalTime,String departureTime) throws ParseException{
-		SimpleDateFormat formatter=new  SimpleDateFormat("yyyy MMM dd HH:mm z");
-		long arrival=formatter.parse(arrivalTime).getTime();
-		long departure=formatter.parse(departureTime).getTime();
-		long layover=departure-arrival;
-		
+	public boolean isValidLayover(String arrivalTime,String departureTime) throws ParseException{
+		long layover = 0;
+		DateTimeFormatter flightDateFormat = DateTimeFormatter.ofPattern("yyyy MMM d H:m z");
+		LocalDateTime departTimeLocal = LocalDateTime.parse(departureTime,flightDateFormat);
+		ZonedDateTime departTimeZoned = departTimeLocal.atZone(ZoneId.of("GMT"));
+		long dTime = departTimeZoned.toInstant().toEpochMilli();
+		LocalDateTime arrivalTimeLocal = LocalDateTime.parse(arrivalTime, flightDateFormat);
+		ZonedDateTime arrivalTimeZoned = arrivalTimeLocal.atZone(ZoneId.of("GMT"));
+		long aTime = arrivalTimeZoned.toInstant().toEpochMilli();
+		layover=dTime-aTime;
+
 		if(layover<Configuration.MIN_LAYOVER_TIME)
 			return false;
 		else if(layover>Configuration.MAX_LAYOVER_TIME)
 			return false;
 		else
 			return true;
+	}
+
+	/**
+	 * This method checks for the constraint that seats must exist on the flight.
+	 * @param flight represents a flight object to be checked.
+	 * @return true if constraint is followed else returns false.
+	 */
+	public boolean seatsAvailable(Flight flight) {
+		if(this.mSeatPreference.equals("firstclass")) {
+			if(flight.getmSeatsFirstclass() == 0) {
+				return false;
+			}
+		} else {
+			if(flight.getmSeatsCoach() == 0) {
+				return false;
+			}
+		}
+		return true;
 	}
 	
 	/**
@@ -156,7 +166,7 @@ public class FlightSearch {
 				airportCode,departuredate);
 		flights.addAll(xmlFlightData);
 	}
-	
+
 	/**
 	 * This method clones a list of type ArrayList<Flight>
 	 * @param list
@@ -164,94 +174,64 @@ public class FlightSearch {
 	 */
 	public static ArrayList<Flight> cloneList(ArrayList<Flight> list) {
 		ArrayList<Flight> clone = new ArrayList<Flight>(list.size());
-	    for(Flight item: list) 
-	    	clone.add(item);
-	    return clone;
+		for(Flight item: list) 
+			clone.add(item);
+		return clone;
 	}
-	
+
 	/**
 	 * This method uses the search parameters to search for valid flights 
 	 * @return an arrayList of the type {@link client.reservation.ReservationOption}
 	 * @throws ParseException
 	 */
 	public ArrayList<ReservationOption> getOptions() throws ParseException{
-		
-		ArrayList<Flight> reservedflights=new ArrayList<Flight>();
+
 		ArrayList<ReservationOption>reservedOptions=new ArrayList<ReservationOption>();
-		Flights firstOutboundflights=new Flights();
-		Flights secondOutboundflights=new Flights();
-		Flights thirdOutboundflights=new Flights();
+		Flights outboundflights=new Flights();
+		Queue<ArrayList<Flight>> nodeQueue = new ArrayDeque<ArrayList<Flight>>();
 
-		addFlights(this.mDepartureAirportCode,dateFormatter(this.mDepartureDate),firstOutboundflights);
-
-		for(Flight flight:firstOutboundflights){
-			
-			// eliminate all flights without seats for our seat type
-			if(mSeatPreference.equals("firstclass")) {
-				if(flight.getmSeatsFirstclass() == 0) {
-					continue;
-				}
-			} else {
-				if(flight.getmSeatsCoach() == 0) {
-					continue;
-				}
+		if(this.mDepartureAirportCode.equals(this.mArrivalAirportCode)) {
+			return reservedOptions;
+		}
+		
+		addFlights(this.mDepartureAirportCode,dateFormatter(this.mDepartureDate),outboundflights);
+		for(int i = 0; i < outboundflights.size(); i++) {
+			ArrayList<Flight> option=new ArrayList<Flight>(Configuration.MAX_LAYOVER+1);
+			Flight flight = outboundflights.get(i);
+			if(!seatsAvailable(flight)) {
+				continue;
 			}
-			
-			//determining flight with no layover
-			if(flight.getmCodeArrival().equals(this.mArrivalAirportCode)){
-				reservedflights.add(flight);
-				reservedOptions.add(new ReservationOption(cloneList(reservedflights)));
-				reservedflights.clear();	
-			} else {
-				    addFlights(flight.getmCodeArrival(),dateFormatter(flight.getmTimeArrival()),secondOutboundflights);
-				    if(checkNextDayFlight(flight.getmTimeArrival())){
-				    	addFlights(flight.getmCodeArrival(),dateFormatter(addOneday(flight.getmTimeArrival())),secondOutboundflights);
-				    }
-					for(Flight firstLayoverFlight:secondOutboundflights){
-						
-						if(checkDepartureTime(flight.getmTimeArrival(),firstLayoverFlight.getmTimeDepart()))
-							continue;
-						
-						if(firstLayoverFlight.getmCodeArrival().equals(this.mArrivalAirportCode)){
-							if(checkLayoverTime(flight.getmTimeArrival(),firstLayoverFlight.getmTimeDepart())){
-							reservedflights.add(flight);
-							reservedflights.add(firstLayoverFlight);
-							reservedOptions.add(new ReservationOption(cloneList(reservedflights)));
-							reservedflights.clear();
-							}
-						}
-						else{
-							
-							addFlights(firstLayoverFlight.getmCodeArrival(),dateFormatter(firstLayoverFlight.getmTimeArrival()),thirdOutboundflights);
-							
-							if(checkNextDayFlight(firstLayoverFlight.getmTimeArrival())){
-						    	addFlights(firstLayoverFlight.getmCodeArrival(),dateFormatter(addOneday(firstLayoverFlight.getmTimeArrival())),thirdOutboundflights);
-						    }
-							
-							for(Flight secondLayoverFlight:thirdOutboundflights){
-								if(checkDepartureTime(firstLayoverFlight.getmTimeArrival(),secondLayoverFlight.getmTimeDepart()))
-									continue;
-								if(secondLayoverFlight.getmCodeArrival().equals(this.mArrivalAirportCode)){
-									if(checkLayoverTime(flight.getmTimeArrival(),firstLayoverFlight.getmTimeDepart()) &&
-											checkLayoverTime(firstLayoverFlight.getmTimeArrival(),secondLayoverFlight.getmTimeDepart())){
-										
-										reservedflights.add(flight);
-										reservedflights.add(firstLayoverFlight);
-										reservedflights.add(secondLayoverFlight);
-										reservedOptions.add(new ReservationOption(cloneList(reservedflights)));
-										reservedflights.clear();
-											
-									}
-									
-								}
-								
-							}
-							thirdOutboundflights.clear();
-							
-						}
-						
-					}
-					secondOutboundflights.clear();		
+			option.add(flight);
+			nodeQueue.add(option);
+		}
+
+		while(!nodeQueue.isEmpty()) {
+			ArrayList<Flight> current = nodeQueue.poll();
+			Flight currFlight = current.get(current.size()-1);
+			if(currFlight.getmCodeArrival().equals(this.mArrivalAirportCode)){
+				reservedOptions.add(new ReservationOption(current));
+				continue;
+			}
+			if ( current.size() > Configuration.MAX_LAYOVER) {
+				continue;
+			}
+			Flights outFlights=new Flights();
+			addFlights(currFlight.getmCodeArrival(),dateFormatter(currFlight.getmTimeArrival()),outFlights);
+			if(checkNextDayFlight(currFlight.getmTimeArrival())){
+				addFlights(currFlight.getmCodeArrival(),dateFormatter(addOneday(currFlight.getmTimeArrival())),outFlights);
+			}
+			Flight lastFlight = current.get(current.size()-1);
+			for(Flight flight:outFlights) {
+				ArrayList<Flight> option=new ArrayList<Flight>(Configuration.MAX_LAYOVER+1);
+				if(!seatsAvailable(flight)) {
+					continue;
+				}
+				if(!isValidLayover(lastFlight.getmTimeArrival(),flight.getmTimeDepart())) {
+					continue;
+				}
+				option.addAll(current);
+				option.add(flight);
+				nodeQueue.add(option);
 			}
 		}
 		return reservedOptions;
