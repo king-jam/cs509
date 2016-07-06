@@ -11,10 +11,9 @@ import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.TimeZone;
 import java.util.Calendar;
-import java.util.HashMap;
 import java.util.Queue;
 
-import client.dao.ServerInterfaceCache;
+import client.dao.*;
 import client.flight.*;
 import client.util.*;
 import client.reservation.*;
@@ -55,7 +54,7 @@ public class FlightSearch {
 		this.mDepartureDate = departuredate;
 		this.mSeatPreference = seatPreference;
 		this.mTicketAgency=Configuration.getAgency();
-		this.mServerInterface=ServerInterfaceCache.getInstance();	
+		this.mServerInterface=ServerInterfaceCache.getInstance();
 	}
 
 	/**
@@ -163,8 +162,6 @@ public class FlightSearch {
 	 * @param flights is of the type {@link client.flight.Flights} to hold Flight objects({@link client.flight.Flight}).
 	 */
 	public void addFlights(String airportCode,String departuredate,Flights flights){
-		//System.out.print(airportCode+" ");
-		//System.out.println(departuredate);
 		String xmlFlightData=mServerInterface.getFlights(mTicketAgency,
 				airportCode,departuredate);
 		flights.addAll(xmlFlightData);
@@ -191,13 +188,13 @@ public class FlightSearch {
 
 		ArrayList<ReservationOption>reservedOptions=new ArrayList<ReservationOption>();
 		Flights outboundflights=new Flights();
-		//Flights secondOutboundflights=new Flights();
-		//Flights thirdOutboundflights=new Flights();
-		HashMap<String,Boolean> airportMap = new HashMap<String, Boolean>();
 		Queue<ArrayList<Flight>> nodeQueue = new ArrayDeque<ArrayList<Flight>>();
 
+		if(this.mDepartureAirportCode.equals(this.mArrivalAirportCode)) {
+			return reservedOptions;
+		}
+		
 		addFlights(this.mDepartureAirportCode,dateFormatter(this.mDepartureDate),outboundflights);
-		airportMap.put(this.mDepartureAirportCode, true);
 		for(int i = 0; i < outboundflights.size(); i++) {
 			ArrayList<Flight> option=new ArrayList<Flight>(Configuration.MAX_LAYOVER+1);
 			Flight flight = outboundflights.get(i);
@@ -219,17 +216,13 @@ public class FlightSearch {
 				continue;
 			}
 			Flights outFlights=new Flights();
-			Boolean visited = airportMap.get(currFlight.getmCodeArrival());
-			if(visited == null || !visited) {
-				addFlights(currFlight.getmCodeArrival(),dateFormatter(this.mDepartureDate),outFlights);
-				if(checkNextDayFlight(currFlight.getmTimeArrival())){
-					addFlights(currFlight.getmCodeArrival(),dateFormatter(addOneday(currFlight.getmTimeArrival())),outFlights);
-				}
-				airportMap.put(currFlight.getmCodeArrival(), true);
+			addFlights(currFlight.getmCodeArrival(),dateFormatter(currFlight.getmTimeArrival()),outFlights);
+			if(checkNextDayFlight(currFlight.getmTimeArrival())){
+				addFlights(currFlight.getmCodeArrival(),dateFormatter(addOneday(currFlight.getmTimeArrival())),outFlights);
 			}
+			Flight lastFlight = current.get(current.size()-1);
 			for(Flight flight:outFlights) {
 				ArrayList<Flight> option=new ArrayList<Flight>(Configuration.MAX_LAYOVER+1);
-				Flight lastFlight = current.get(current.size()-1);
 				if(!seatsAvailable(flight)) {
 					continue;
 				}
