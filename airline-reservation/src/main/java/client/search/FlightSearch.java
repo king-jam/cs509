@@ -2,14 +2,18 @@ package client.search;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
-import java.util.Queue;
 import java.util.Date;
 import java.util.TimeZone;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.Queue;
 
 import client.dao.ServerInterfaceCache;
 import client.flight.*;
@@ -34,7 +38,7 @@ public class FlightSearch {
 	private String mSeatPreference;
 	private String mTicketAgency;
 	private ServerInterfaceCache mServerInterface;
-	
+
 	/**
 	 * Constructor
 	 * 
@@ -46,15 +50,15 @@ public class FlightSearch {
 	public FlightSearch(String departureAirportCode,
 			String arrivalAirportCode,
 			String departuredate, String seatPreference) {
-		
+
 		this.mDepartureAirportCode = departureAirportCode;
 		this.mArrivalAirportCode = arrivalAirportCode;
 		this.mDepartureDate = departuredate;
 		this.mSeatPreference = seatPreference;
 		this.mTicketAgency=Configuration.getAgency();
-		this.mServerInterface=new ServerInterfaceCache();		
+		this.mServerInterface=ServerInterfaceCache.getInstance();	
 	}
-	
+
 	/**
 	 * This method converts a date string from "yyyy MMM dd HH:mm z" format to "yyyy_MM_dd" format.
 	 * 
@@ -63,14 +67,14 @@ public class FlightSearch {
 	 * @throws ParseException
 	 */
 	public String dateFormatter(String date) throws ParseException{
-		
+
 		SimpleDateFormat formatter=new  SimpleDateFormat("yyyy MMM dd HH:mm z");
 		SimpleDateFormat departureDateFormatter=new  SimpleDateFormat("yyyy_MM_dd");
 		departureDateFormatter.setTimeZone(TimeZone.getTimeZone("GMT"));
 		String departuredate=departureDateFormatter.format(formatter.parse(date));
 		return departuredate;
 	}
-	
+
 	/**
 	 * This method checks if the arrival time of a particular flight is after the departure time of another.
 	 * 
@@ -88,7 +92,7 @@ public class FlightSearch {
 		else
 			return false;
 	}
-	
+
 	/**
 	 * This method verifies whether a arrival time of a flight is after 9pm.
 	 * It is a constraint to check for connecting flights in the next day.
@@ -109,7 +113,7 @@ public class FlightSearch {
 		else
 			return false;
 	}
-	
+
 	/**
 	 * This method adds one day to date given as the parameter.
 	 * 
@@ -124,7 +128,7 @@ public class FlightSearch {
 		calendar.add(Calendar.DATE, 1);
 		return formatter.format(calendar.getTime());
 	}
-	
+
 	/**
 	 * This method checks for the constraint that the layover_time >= 30min and layover_time<=3hrs.
 	 * The above constraint is verified for connecting flights
@@ -134,17 +138,41 @@ public class FlightSearch {
 	 * @throws ParseException
 	 */
 	public boolean checkLayoverTime(String arrivalTime,String departureTime) throws ParseException{
-		SimpleDateFormat formatter=new  SimpleDateFormat("yyyy MMM dd HH:mm z");
-		long arrival=formatter.parse(arrivalTime).getTime();
-		long departure=formatter.parse(departureTime).getTime();
-		long layover=departure-arrival;
-		
+		long layover = 0;
+		DateTimeFormatter flightDateFormat = DateTimeFormatter.ofPattern("yyyy MMM d H:m z");
+		LocalDateTime departTimeLocal = LocalDateTime.parse(departureTime,flightDateFormat);
+		ZonedDateTime departTimeZoned = departTimeLocal.atZone(ZoneId.of("GMT"));
+		long dTime = departTimeZoned.toInstant().toEpochMilli();
+		LocalDateTime arrivalTimeLocal = LocalDateTime.parse(arrivalTime, flightDateFormat);
+		ZonedDateTime arrivalTimeZoned = arrivalTimeLocal.atZone(ZoneId.of("GMT"));
+		long aTime = arrivalTimeZoned.toInstant().toEpochMilli();
+		layover=dTime-aTime;
+
 		if(layover<Configuration.MIN_LAYOVER_TIME)
 			return false;
 		else if(layover>Configuration.MAX_LAYOVER_TIME)
 			return false;
 		else
 			return true;
+	}
+
+	/**
+	 * This method checks for the constraint that seats must exist on the flight.
+	 * @param flight represents a flight object to be checked.
+	 * @param seatPreference represents the preferred seating that was requested.
+	 * @return true if constraint is followed else returns false.
+	 */
+	public boolean checkSeating(Flight flight) {
+		if(this.mSeatPreference.equals("firstclass")) {
+			if(flight.getmSeatsFirstclass() == 0) {
+				return false;
+			}
+		} else {
+			if(flight.getmSeatsCoach() == 0) {
+				return false;
+			}
+		}
+		return true;
 	}
 	
 	/**
@@ -155,13 +183,13 @@ public class FlightSearch {
 	 * @param flights is of the type {@link client.flight.Flights} to hold Flight objects({@link client.flight.Flight}).
 	 */
 	public void addFlights(String airportCode,String departuredate,Flights flights){
-		System.out.print(airportCode+" ");
-		System.out.println(departuredate);
+		//System.out.print(airportCode+" ");
+		//System.out.println(departuredate);
 		String xmlFlightData=mServerInterface.getFlights(mTicketAgency,
 				airportCode,departuredate);
 		flights.addAll(xmlFlightData);
 	}
-	
+
 	/**
 	 * This method clones a list of type ArrayList<Flight>
 	 * @param list
@@ -169,114 +197,92 @@ public class FlightSearch {
 	 */
 	public static ArrayList<Flight> cloneList(ArrayList<Flight> list) {
 		ArrayList<Flight> clone = new ArrayList<Flight>(list.size());
-	    for(Flight item: list) 
-	    	clone.add(item);
-	    return clone;
+		for(Flight item: list) 
+			clone.add(item);
+		return clone;
 	}
-  
+
 	/**
 	 * This method uses the search parameters to search for valid flights 
 	 * @return an arrayList of the type {@link client.reservation.ReservationOption}
 	 * @throws ParseException
 	 */
 	public ArrayList<ReservationOption> getOptions() throws ParseException{
-		
-		ArrayList<Flight> reservedflights=new ArrayList<Flight>();
-		ArrayList<ReservationOption>reservedOptions=new ArrayList<ReservationOption>();
-		Flights firstOutboundflights=new Flights();
-		Flights secondOutboundflights=new Flights();
-		Flights thirdOutboundflights=new Flights();
-		HashMap<String, Boolean> hMap = new HashMap<String, Boolean>();
-		
-		hMap.put(this.mDepartureAirportCode, true);
-		addFlights(this.mDepartureAirportCode,dateFormatter(this.mDepartureDate),firstOutboundflights);
 
-		for(Flight flight:firstOutboundflights){
-			// eliminate all flights without seats for our seat type
-			if(mSeatPreference.equals("firstclass")) {
-				if(flight.getmSeatsFirstclass() == 0) {
-					continue;
-				}
-			} else {
-				if(flight.getmSeatsCoach() == 0) {
-					continue;
-				}
+		ArrayList<ReservationOption>reservedOptions=new ArrayList<ReservationOption>();
+		Flights outboundflights=new Flights();
+		//Flights secondOutboundflights=new Flights();
+		//Flights thirdOutboundflights=new Flights();
+		HashMap<String,Boolean> flightMap = new HashMap<String, Boolean>();
+		HashMap<String,Boolean> airportMap = new HashMap<String, Boolean>();
+		Queue<ArrayList<Flight>> nodeQueue = new ArrayDeque<ArrayList<Flight>>();
+		int currentDepth = 0;
+		int elementsToDepthIncrease = 1;
+		int nextElementsToDepthIncrease = 0;
+
+		addFlights(this.mDepartureAirportCode,dateFormatter(this.mDepartureDate),outboundflights);
+		airportMap.put(this.mDepartureAirportCode, true);
+		for(int i = 0; i < outboundflights.size(); i++) {
+			ArrayList<Flight> option=new ArrayList<Flight>();
+			Flight flight = outboundflights.get(i);
+			if(!checkSeating(flight)) {
+				flightMap.put(flight.getmNumber(), true);
+				continue;
 			}
-			
-			
-			//determining flight with no layover
-			if(flight.getmCodeArrival().equals(this.mArrivalAirportCode)){
-				reservedflights.add(flight);
-				reservedOptions.add(new ReservationOption(cloneList(reservedflights)));
-				reservedflights.clear();	
-			} else {
-					boolean val = false;
-					try {
-						val = hMap.get(flight.getmCodeArrival());
-					} catch (NullPointerException e) {
-						hMap.put(flight.getmCodeArrival(), true);
-					}
-					if(val) {
+			option.add(flight);
+			nodeQueue.add(option);
+			flightMap.put(flight.getmNumber(), true);
+		}
+
+		while(!nodeQueue.isEmpty()) {
+			ArrayList<Flight> current = nodeQueue.poll();
+
+			Flight currFlight = current.get(current.size()-1);
+			if(currFlight.getmCodeArrival().equals(this.mArrivalAirportCode)){
+				reservedOptions.add(new ReservationOption(current));
+				continue;
+			}
+			Flights outFlights=new Flights();
+			Boolean visited = airportMap.get(currFlight.getmCodeArrival());
+			if(visited == null || !visited) {
+				addFlights(currFlight.getmCodeArrival(),dateFormatter(this.mDepartureDate),outFlights);
+				if(checkNextDayFlight(currFlight.getmTimeArrival())){
+					addFlights(currFlight.getmCodeArrival(),dateFormatter(addOneday(currFlight.getmTimeArrival())),outFlights);
+				}
+				airportMap.put(currFlight.getmCodeArrival(), true);
+			}
+			nextElementsToDepthIncrease += outFlights.size();
+		    if (--elementsToDepthIncrease == 0) {
+		        if (++currentDepth > 2) {
+		        	return reservedOptions;
+		        }
+		        elementsToDepthIncrease = nextElementsToDepthIncrease;
+		        nextElementsToDepthIncrease = 0;
+		    }
+			for(Flight flight:outFlights) {
+				Boolean val = flightMap.get(flight.getmNumber());
+				if(val == null || !val) {
+					ArrayList<Flight> option=new ArrayList<Flight>();
+					Flight lastFlight = current.get(current.size()-1);
+					if(!checkSeating(flight)) {
+						flightMap.put(flight.getmNumber(), true);
 						continue;
 					}
-				    addFlights(flight.getmCodeArrival(),dateFormatter(flight.getmTimeArrival()),secondOutboundflights);
-				    if(checkNextDayFlight(flight.getmTimeArrival())){
-				    	addFlights(flight.getmCodeArrival(),dateFormatter(addOneday(flight.getmTimeArrival())),secondOutboundflights);
-				    }
-					for(Flight firstLayoverFlight:secondOutboundflights){
-						
-						if(checkDepartureTime(flight.getmTimeArrival(),firstLayoverFlight.getmTimeDepart()))
-							continue;
-						
-						if(firstLayoverFlight.getmCodeArrival().equals(this.mArrivalAirportCode)){
-							if(checkLayoverTime(flight.getmTimeArrival(),firstLayoverFlight.getmTimeDepart())){
-							reservedflights.add(flight);
-							reservedflights.add(firstLayoverFlight);
-							reservedOptions.add(new ReservationOption(cloneList(reservedflights)));
-							reservedflights.clear();
-							}
-						}
-						else{
-							val = false;
-							try {
-								val = hMap.get(flight.getmCodeArrival());
-							} catch (NullPointerException e) {
-								hMap.put(flight.getmCodeArrival(), true);
-							}
-							if(val) {
-								continue;
-							}
-							addFlights(firstLayoverFlight.getmCodeArrival(),dateFormatter(firstLayoverFlight.getmTimeArrival()),thirdOutboundflights);
-							
-							if(checkNextDayFlight(firstLayoverFlight.getmTimeArrival())){
-						    	addFlights(firstLayoverFlight.getmCodeArrival(),dateFormatter(addOneday(firstLayoverFlight.getmTimeArrival())),thirdOutboundflights);
-						    }
-							
-							for(Flight secondLayoverFlight:thirdOutboundflights){
-								if(checkDepartureTime(firstLayoverFlight.getmTimeArrival(),secondLayoverFlight.getmTimeDepart()))
-									continue;
-								if(secondLayoverFlight.getmCodeArrival().equals(this.mArrivalAirportCode)){
-									if(checkLayoverTime(flight.getmTimeArrival(),firstLayoverFlight.getmTimeDepart()) &&
-											checkLayoverTime(firstLayoverFlight.getmTimeArrival(),secondLayoverFlight.getmTimeDepart())){
-										
-										reservedflights.add(flight);
-										reservedflights.add(firstLayoverFlight);
-										reservedflights.add(secondLayoverFlight);
-										reservedOptions.add(new ReservationOption(cloneList(reservedflights)));
-										reservedflights.clear();
-											
-									}
-									
-								}
-								
-							}
-							thirdOutboundflights.clear();
-							
-						}
-						
+					if(checkDepartureTime(lastFlight.getmTimeArrival(),flight.getmTimeDepart())) {
+						flightMap.put(flight.getmNumber(), true);
+						continue;
 					}
-					secondOutboundflights.clear();		
+					if(!checkLayoverTime(lastFlight.getmTimeArrival(),flight.getmTimeDepart())) {
+						flightMap.put(flight.getmNumber(), true);
+						continue;
+					}
+					option.addAll(current);
+					option.add(flight);
+					flightMap.put(flight.getmNumber(), true);
+					nodeQueue.add(option);
+				}
 			}
+			
 		}
 		return reservedOptions;
 	}

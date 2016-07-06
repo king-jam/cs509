@@ -31,19 +31,21 @@ import client.util.QueryFactory;
  *
  */
 public class ServerInterfaceCache {
+	
 	private final String mUrlBase = "http://cs509.cs.wpi.edu:8181/CS509.server/ReservationSystem";
 	private CacheManager cacheManager;
 	private Cache<String, String> airportCache;
 	private Cache<String, String> flightCache;
-	/**
-	 * Return an XML list of all the airports
-	 * 
-	 * Retrieve the list of airports available to the specified ticketAgency via HTTPGet of the server
-	 * 
-	 * @param team identifies the Team requesting the information
-	 * @return xml string listing all airports
-	 */
-	public ServerInterfaceCache() {
+	
+	private static ServerInterfaceCache instance; 
+	
+	public static ServerInterfaceCache getInstance(){
+		if(instance==null)
+			instance=new ServerInterfaceCache();
+		return instance;
+	}
+	
+	private ServerInterfaceCache() {
 		this.cacheManager = CacheManagerBuilder.newCacheManagerBuilder().withCache("airports",
 			    CacheConfigurationBuilder.newCacheConfigurationBuilder(String.class, String.class,
 			        ResourcePoolsBuilder.newResourcePoolsBuilder()
@@ -59,6 +61,14 @@ public class ServerInterfaceCache {
 			    		.offheap(10, MemoryUnit.MB)).build());
 	}
 	
+	/**
+	 * Return an XML list of all the airports
+	 * 
+	 * Retrieve the list of airports available to the specified ticketAgency via HTTPGet of the server
+	 * 
+	 * @param team identifies the Team requesting the information
+	 * @return xml string listing all airports
+	 */	
 	public String getAirports (String team) {
 
 		URL url;

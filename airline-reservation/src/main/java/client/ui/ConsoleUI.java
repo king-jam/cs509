@@ -142,7 +142,7 @@ public class ConsoleUI {
 		String mDepartureDate = "";
 		String mReturnDate = "";
 		ArrayList<ReservationOption> selectedOptions = new ArrayList<ReservationOption>();
-		ServerInterfaceCache mServerInterface = new ServerInterfaceCache();
+		ServerInterfaceCache mServerInterface = ServerInterfaceCache.getInstance();
 		Airports airports = new Airports();
 		String airportData = mServerInterface.getAirports(Configuration.getAgency());
 		airports.addAll(airportData);
@@ -289,7 +289,7 @@ public class ConsoleUI {
 				long start = System.currentTimeMillis();
 				toOptions = search.getOptions();
 				long end = System.currentTimeMillis();
-				System.out.printf("Total Time: %d", end-start);
+				System.out.printf("Total Time: %d\n", end-start);
 			} catch (ParseException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -340,7 +340,7 @@ public class ConsoleUI {
 					long start = System.currentTimeMillis();
 					retOptions = search2.getOptions();
 					long end = System.currentTimeMillis();
-					System.out.printf("Total Time: %d", end-start);
+					System.out.printf("Total Time: %d\n", end-start);
 				} catch (ParseException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
