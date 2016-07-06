@@ -9,7 +9,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
-import java.util.Date;
 import java.util.TimeZone;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -76,24 +75,6 @@ public class FlightSearch {
 	}
 
 	/**
-	 * This method checks if the arrival time of a particular flight is after the departure time of another.
-	 * 
-	 * @param arrivalTime represents the string in "yyyy MMM dd HH:mm z" format.
-	 * @param departureTime represents the string in "yyyy MMM dd HH:mm z" format.
-	 * @return true if arrivalTime>departurTime else false
-	 * @throws ParseException
-	 */
-	public boolean checkDepartureTime(String arrivalTime,String departureTime) throws ParseException{
-		SimpleDateFormat formatter=new  SimpleDateFormat("yyyy MMM dd HH:mm z");
-		Date arrival=formatter.parse(arrivalTime);
-		Date departure=formatter.parse(departureTime);
-		if(arrival.after(departure))
-			return true;
-		else
-			return false;
-	}
-
-	/**
 	 * This method verifies whether a arrival time of a flight is after 9pm.
 	 * It is a constraint to check for connecting flights in the next day.
 	 * 
@@ -108,10 +89,10 @@ public class FlightSearch {
 		int hour=calendar.get(Calendar.HOUR_OF_DAY);
 		int minute=calendar.get(Calendar.MINUTE);
 		if((hour==Configuration.DAY_HOUR_NEXT_FLIGHT && minute>0)||(hour>Configuration.DAY_HOUR_NEXT_FLIGHT)){
-			return true;		
-		}
-		else
+			return true;
+		} else {
 			return false;
+		}
 	}
 
 	/**
@@ -130,14 +111,14 @@ public class FlightSearch {
 	}
 
 	/**
-	 * This method checks for the constraint that the layover_time >= 30min and layover_time<=3hrs.
+	 * This method checks for the constraints that the layover_time >= 30min and layover_time<=3hrs.
 	 * The above constraint is verified for connecting flights
 	 * @param arrivalTime represents the arrival time of a flight in "yyyy MMM dd HH:mm z" string format.
 	 * @param departureTime represents the departure time of a connecting flight in "yyyy MMM dd HH:mm z" string format.
 	 * @return true if constraint is followed else returns false.
 	 * @throws ParseException
 	 */
-	public boolean checkLayoverTime(String arrivalTime,String departureTime) throws ParseException{
+	public boolean isValidLayover(String arrivalTime,String departureTime) throws ParseException{
 		long layover = 0;
 		DateTimeFormatter flightDateFormat = DateTimeFormatter.ofPattern("yyyy MMM d H:m z");
 		LocalDateTime departTimeLocal = LocalDateTime.parse(departureTime,flightDateFormat);
@@ -159,10 +140,9 @@ public class FlightSearch {
 	/**
 	 * This method checks for the constraint that seats must exist on the flight.
 	 * @param flight represents a flight object to be checked.
-	 * @param seatPreference represents the preferred seating that was requested.
 	 * @return true if constraint is followed else returns false.
 	 */
-	public boolean checkSeating(Flight flight) {
+	public boolean seatsAvailable(Flight flight) {
 		if(this.mSeatPreference.equals("firstclass")) {
 			if(flight.getmSeatsFirstclass() == 0) {
 				return false;
@@ -213,33 +193,29 @@ public class FlightSearch {
 		Flights outboundflights=new Flights();
 		//Flights secondOutboundflights=new Flights();
 		//Flights thirdOutboundflights=new Flights();
-		HashMap<String,Boolean> flightMap = new HashMap<String, Boolean>();
 		HashMap<String,Boolean> airportMap = new HashMap<String, Boolean>();
 		Queue<ArrayList<Flight>> nodeQueue = new ArrayDeque<ArrayList<Flight>>();
-		int currentDepth = 0;
-		int elementsToDepthIncrease = 1;
-		int nextElementsToDepthIncrease = 0;
 
 		addFlights(this.mDepartureAirportCode,dateFormatter(this.mDepartureDate),outboundflights);
 		airportMap.put(this.mDepartureAirportCode, true);
 		for(int i = 0; i < outboundflights.size(); i++) {
-			ArrayList<Flight> option=new ArrayList<Flight>();
+			ArrayList<Flight> option=new ArrayList<Flight>(Configuration.MAX_LAYOVER+1);
 			Flight flight = outboundflights.get(i);
-			if(!checkSeating(flight)) {
-				flightMap.put(flight.getmNumber(), true);
+			if(!seatsAvailable(flight)) {
 				continue;
 			}
 			option.add(flight);
 			nodeQueue.add(option);
-			flightMap.put(flight.getmNumber(), true);
 		}
 
 		while(!nodeQueue.isEmpty()) {
 			ArrayList<Flight> current = nodeQueue.poll();
-
 			Flight currFlight = current.get(current.size()-1);
 			if(currFlight.getmCodeArrival().equals(this.mArrivalAirportCode)){
 				reservedOptions.add(new ReservationOption(current));
+				continue;
+			}
+			if ( current.size() > Configuration.MAX_LAYOVER) {
 				continue;
 			}
 			Flights outFlights=new Flights();
@@ -251,38 +227,19 @@ public class FlightSearch {
 				}
 				airportMap.put(currFlight.getmCodeArrival(), true);
 			}
-			nextElementsToDepthIncrease += outFlights.size();
-		    if (--elementsToDepthIncrease == 0) {
-		        if (++currentDepth > 2) {
-		        	return reservedOptions;
-		        }
-		        elementsToDepthIncrease = nextElementsToDepthIncrease;
-		        nextElementsToDepthIncrease = 0;
-		    }
 			for(Flight flight:outFlights) {
-				Boolean val = flightMap.get(flight.getmNumber());
-				if(val == null || !val) {
-					ArrayList<Flight> option=new ArrayList<Flight>();
-					Flight lastFlight = current.get(current.size()-1);
-					if(!checkSeating(flight)) {
-						flightMap.put(flight.getmNumber(), true);
-						continue;
-					}
-					if(checkDepartureTime(lastFlight.getmTimeArrival(),flight.getmTimeDepart())) {
-						flightMap.put(flight.getmNumber(), true);
-						continue;
-					}
-					if(!checkLayoverTime(lastFlight.getmTimeArrival(),flight.getmTimeDepart())) {
-						flightMap.put(flight.getmNumber(), true);
-						continue;
-					}
-					option.addAll(current);
-					option.add(flight);
-					flightMap.put(flight.getmNumber(), true);
-					nodeQueue.add(option);
+				ArrayList<Flight> option=new ArrayList<Flight>(Configuration.MAX_LAYOVER+1);
+				Flight lastFlight = current.get(current.size()-1);
+				if(!seatsAvailable(flight)) {
+					continue;
 				}
+				if(!isValidLayover(lastFlight.getmTimeArrival(),flight.getmTimeDepart())) {
+					continue;
+				}
+				option.addAll(current);
+				option.add(flight);
+				nodeQueue.add(option);
 			}
-			
 		}
 		return reservedOptions;
 	}

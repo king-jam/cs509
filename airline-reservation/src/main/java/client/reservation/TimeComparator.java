@@ -24,7 +24,6 @@ public class TimeComparator implements Comparator<ReservationOption> {
 	 * 
 	 * @return -1 if less than, 0 if equal, 1 if greater than
 	 */
-	//@Override
 	public int compare(ReservationOption r1, ReservationOption r2) {
 		String price1 = r1.getTotalTime();
 		String price2 = r2.getTotalTime();
