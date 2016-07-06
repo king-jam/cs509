@@ -346,4 +346,8 @@ public class ServerInterfaceCache {
 			return false;
 		}
 	}
+	
+	protected void finalize() throws Throwable {
+		this.cacheManager.close();
+	}
 }
