@@ -38,7 +38,6 @@ public class ConsoleUI {
 	 * Global Data attributes for a ConsoleUI
 	 */
 	private static final String quitKeyword = "q";
-	ExecutorService executor = Executors.newWorkStealingPool();
 	/**
 	 * prints a formatted ReservationOption for display
 	 * 
