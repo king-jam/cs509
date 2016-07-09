@@ -13,6 +13,17 @@ import java.util.TimeZone;
 import java.util.Calendar;
 import java.util.Queue;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
 import client.dao.*;
 import client.flight.*;
 import client.util.*;
@@ -236,4 +247,51 @@ public class FlightSearch {
 		}
 		return reservedOptions;
 	}
+	boolean reserveFlight(ArrayList<ReservationOption> selectedOption){
+		//get the lock to the DB
+		if(!mServerInterface.lock(Configuration.TICKET_AGENCY)){
+			System.out.println("Lock not available.Try again Later");
+			return false;
+		}
+		 DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+		 try {
+			ReservationOption reservationoption;
+			Flight flight;
+			Element flight_xml;
+			DocumentBuilder db = dbf.newDocumentBuilder();
+			Document document = db.newDocument();
+			Element root = document.createElement("Flights");
+			document.appendChild(root);
+			for(int i=0;i<selectedOptions.size();i++){
+				reservationoption=selectedOptions.get(i);
+				for(int j=0;j<3;j++){
+					flight=reservationoption.getFlight(j);
+					if(flight==null)
+						break;
+					flight_xml=document.createElement("Flight");
+					flight_xml.setAttribute("number",flight.getmNumber());
+					flight_xml.setAttribute("seating",reservationoption.);
+					
+					
+					
+					
+					
+					
+				}
+				
+				
+				
+			}
+		} catch (ParserConfigurationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return false;
+		}
+		 Document document = db.newDocument();
+		 
+		
+		
+		
+	}
+	
 }
