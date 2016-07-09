@@ -241,9 +241,9 @@ public class ConsoleUI {
 					} else {
 						seatPref = true;
 						if(selection == 1) {
-							mSeatPreference = "coach";
+							mSeatPreference = "Coach";
 						} else {
-							mSeatPreference = "firstclass";
+							mSeatPreference = "FirstClass";
 						}
 					}
 				}

@@ -1,5 +1,6 @@
 package client.search;
 
+import java.io.StringWriter;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
@@ -16,7 +17,9 @@ import java.util.Queue;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
@@ -247,47 +250,58 @@ public class FlightSearch {
 		}
 		return reservedOptions;
 	}
-	boolean reserveFlight(ArrayList<ReservationOption> selectedOption){
+	
+	public boolean reserveFlight(ReservationOption selectedOption){
 		//get the lock to the DB
 		if(!mServerInterface.lock(Configuration.TICKET_AGENCY)){
 			System.out.println("Lock not available.Try again Later");
 			return false;
 		}
+		//creating a XML string of flight data
 		 DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 		 try {
-			ReservationOption reservationoption;
 			Flight flight;
 			Element flight_xml;
 			DocumentBuilder db = dbf.newDocumentBuilder();
 			Document document = db.newDocument();
 			Element root = document.createElement("Flights");
 			document.appendChild(root);
-			for(int i=0;i<selectedOptions.size();i++){
-				reservationoption=selectedOptions.get(i);
-				for(int j=0;j<3;j++){
-					flight=reservationoption.getFlight(j);
-					if(flight==null)
-						break;
-					flight_xml=document.createElement("Flight");
-					flight_xml.setAttribute("number",flight.getmNumber());
-					flight_xml.setAttribute("seating",reservationoption.);
-					
-					
-					
-					
-					
-					
+			for(int j=0;j<3;j++){
+				flight=selectedOption.getFlight(j);
+				if(flight==null)
+					break;
+				flight_xml=document.createElement("Flight");
+				flight_xml.setAttribute("number",flight.getmNumber());
+				flight_xml.setAttribute("seating",this.mSeatPreference);
+				root.appendChild(flight_xml);
 				}
-				
-				
-				
+			TransformerFactory tf = TransformerFactory.newInstance();
+			Transformer transformer = tf.newTransformer();
+			transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+			StringWriter writer = new StringWriter();
+			transformer.transform(new DOMSource(document), new StreamResult(writer));
+			System.out.println("Xml filght data"+writer.toString());
+			
+			if(mServerInterface.buyTickets(Configuration.TICKET_AGENCY,writer.toString())){
+				mServerInterface.unlock(Configuration.TICKET_AGENCY);
+				return true;
+			 }
+			else{
+				mServerInterface.unlock(Configuration.TICKET_AGENCY);
+				mServerInterface.clearFlightCache();
+				return false;
 			}
-		} catch (ParserConfigurationException e) {
+		
+		 } catch (ParserConfigurationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return false;
+		} catch (TransformerException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return false;
 		}
-		 Document document = db.newDocument();
+
 		 
 		
 		

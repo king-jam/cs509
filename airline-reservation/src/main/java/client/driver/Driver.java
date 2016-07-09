@@ -15,7 +15,7 @@ public class Driver {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		FlightSearch search=new FlightSearch("BOS","LGA","2016 May 10 00:05 GMT","firstclass");
+		FlightSearch search=new FlightSearch("BOS","LGA","2016 May 10 00:05 GMT","FirstClass");
 		try {
 			ArrayList<ReservationOption> ar =search.getOptions();
 			Flight flight;
@@ -35,8 +35,14 @@ public class Driver {
 					
 				}
 				System.out.println("---------------------------");
+				
 			}
-			
+			ReservationOption res=ar.get(4);
+			if(search.reserveFlight(res))
+				System.out.println("Reservation successful");
+			else 
+				System.out.println("Reservation unsuccessful");
+				
 			
 		} catch (ParseException e) {
 			// TODO Auto-generated catch block

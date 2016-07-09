@@ -350,4 +350,8 @@ public class ServerInterfaceCache {
 	protected void finalize() throws Throwable {
 		this.cacheManager.close();
 	}
+	
+	public void clearFlightCache(){
+		this.flightCache.clear();
+	}
 }
