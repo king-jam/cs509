@@ -302,10 +302,6 @@ public class FlightSearch {
 			return false;
 		}
 
-		 
-		
-		
-		
 	}
 	
 }
