@@ -29,7 +29,7 @@ public class FlightSearchSorter {
 
 		if(seatType.equals("FirstClass")) {
 			Collections.sort(resOptions, new PriceComparatorFirstClass());
-		} else if(seatType.equals("coach")) {
+		} else if(seatType.equals("Coach")) {
 			Collections.sort(resOptions, new PriceComparatorCoach());
 		}
 		if (!ascending) {
