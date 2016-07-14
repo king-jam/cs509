@@ -1,5 +1,7 @@
 package client.reservation;
 
+import java.util.ArrayList;
+
 import client.flight.Flight;
 import junit.framework.Test;
 import junit.framework.TestCase;
@@ -25,9 +27,9 @@ public class ReservationOptionTest extends TestCase {
     }
 
     /**
-     * test the getFlight method of the class
+     * test the positive scenarios of the class
      */
-    public void testReservationOption()
+    public void testReservationOptionClean()
     {
     	Flight f1 = new Flight(
     			"A320",
@@ -68,7 +70,11 @@ public class ReservationOptionTest extends TestCase {
     			"$22.79",
     			69
     			);
-    	ReservationOption res = new ReservationOption(f1, f2, f3);
+    	ArrayList<Flight> list = new ArrayList<Flight>();
+    	list.add(f1);
+    	list.add(f2);
+    	list.add(f3);
+    	ReservationOption res = new ReservationOption(list);
     	
         assertEquals("The returned flight (0) does not match", f1, res.getFlight(0) );
         assertEquals("The returned flight (1) does not match", f2, res.getFlight(1) );
@@ -78,6 +84,25 @@ public class ReservationOptionTest extends TestCase {
         assertEquals("The returned price does not match Coach", 70.37, res.getPrice("Coach") );
         assertEquals("The returned price does not match First Class", 211.33, res.getPrice("FirstClass") );
         assertEquals("The returned total time does not match", "13:25", res.getTotalTime() );
+
+    }
+    
+
+    /**
+     * test the positive scenarios of the class
+     */
+    public void testReservationOptionEmpty()
+    {
+    	ReservationOption res = new ReservationOption();
+    	
+        assertEquals("The returned flight is not null", null, res.getFlight(0) );
+        assertEquals("The returned flight is not null", null, res.getFlight(1) );
+        assertEquals("The returned flight is not null", null, res.getFlight(2) );
+        assertEquals("The returned # of flights is not 0", 0, res.getNumFlights() );
+        assertEquals("The returned # of layovers is not 0", 0, res.getNumLayovers() );
+        assertEquals("The returned price is not 0.00", 0.00, res.getPrice("Coach") );
+        assertEquals("The returned price is not 0.00", 0.00, res.getPrice("FirstClass") );
+        assertEquals("The returned total time is not 00:00", "00:00", res.getTotalTime() );
 
     }
 }

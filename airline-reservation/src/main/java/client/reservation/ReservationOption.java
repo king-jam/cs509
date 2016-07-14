@@ -43,66 +43,6 @@ public class ReservationOption {
 		this.flightList = new ArrayList<Flight>();
 	}
 	/**
-	 * constructor with all required field values supplied individually
-	 * 
-	 * This constructor will create a valid ReservationOption object.
-	 * The constructor takes a set of individual flights and stores them into its internal data
-	 * attributes.
-	 * 
-	 * @param flightOne is the first flight
-	 * @param flightTwo is the second flight
-	 * @param flightThree is the third flight
-	 * 
-	 * precondition valid flights
-	 * postcondition attributes are initialized with valid values 
-	 */
-	public ReservationOption(
-			Flight flightOne,
-			Flight flightTwo,
-			Flight flightThree) {
-		this.flightList = new ArrayList<Flight>();
-		if(flightOne != null) { 
-			this.flightList.add(flightOne);
-		}
-		if(flightTwo != null) { 
-			this.flightList.add(flightTwo);
-		}
-		if(flightThree != null) {
-			this.flightList.add(flightThree);
-		}
-	}
-	/**
-	 * constructor with all required field values supplied individually
-	 * 
-	 * This constructor will create a valid ReservationOption object.
-	 * The constructor takes a set of individual flights and stores them into its internal data
-	 * attributes.
-	 * 
-	 * @param flightOne is the first flight
-	 * @param flightTwo is the second flight
-	 * 
-	 * precondition valid flights
-	 * postcondition attributes are initialized with valid values 
-	 */
-	public ReservationOption(Flight flightOne, Flight flightTwo) {
-		this(flightOne, flightTwo, null);
-	}
-	/**
-	 * constructor with all required field values supplied individually
-	 * 
-	 * This constructor will create a valid ReservationOption object.
-	 * The constructor takes a set of individual flights and stores them into its internal data
-	 * attributes.
-	 * 
-	 * @param flightOne is the first flight
-	 * 
-	 * precondition valid flights
-	 * postcondition attributes are initialized with valid values 
-	 */
-	public ReservationOption(Flight flightOne) {
-		this(flightOne,null,null);
-	}
-	/**
 	 * constructor with all required field values supplied
 	 * 
 	 * This constructor will create a valid ReservationOption object.
@@ -152,7 +92,11 @@ public class ReservationOption {
 	 */
 	public int getNumLayovers() {
 		try {
-			return this.flightList.size()-1;
+			if (this.flightList.size() == 0) {
+				return 0;
+			} else {
+				return this.flightList.size()-1;
+			}
 		} catch (Exception ex) {
 			return 0;
 		}
@@ -193,6 +137,9 @@ public class ReservationOption {
 	public String getTotalTime() {
 		DateTimeFormatter flightDateFormat = DateTimeFormatter.ofPattern("yyyy MMM d H:m z");
 		long totalTime = 0;
+		if (this.flightList.size() == 0) {
+			return "00:00";
+		}
 		try {
 			LocalDateTime departTimeLocal = LocalDateTime.parse(this.getFlight(0).getmTimeDepart(),flightDateFormat);
 			ZonedDateTime departTimeZoned = departTimeLocal.atZone(ZoneId.of("GMT"));
