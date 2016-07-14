@@ -111,6 +111,9 @@ public class ReservationOption {
 	public double getPrice(String seatPreference) {
 		double totalPrice = 0.0;
 		boolean firstClass = false;
+		if(this.flightList == null || this.flightList.size() == 0) {
+			return 0.00;
+		}
 		if(seatPreference.equals("FirstClass")) {
 			firstClass = true;
 		} else {
@@ -137,7 +140,7 @@ public class ReservationOption {
 	public String getTotalTime() {
 		DateTimeFormatter flightDateFormat = DateTimeFormatter.ofPattern("yyyy MMM d H:m z");
 		long totalTime = 0;
-		if (this.flightList.size() == 0) {
+		if (this.flightList == null || this.flightList.size() == 0) {
 			return "00:00";
 		}
 		try {
@@ -150,6 +153,7 @@ public class ReservationOption {
 			totalTime = arrivalTime - departTime;
 		} catch (DateTimeParseException ex) {
 			ex.printStackTrace();
+			return "INVALID";
 		}
 		return String.format("%02d:%02d",
 				TimeUnit.MILLISECONDS.toHours(totalTime),
@@ -158,8 +162,6 @@ public class ReservationOption {
 	}
 	
 	private double round(double value, int places) {
-	    if (places < 0) throw new IllegalArgumentException();
-
 	    BigDecimal bd = new BigDecimal(value);
 	    bd = bd.setScale(places, RoundingMode.HALF_UP);
 	    return bd.doubleValue();

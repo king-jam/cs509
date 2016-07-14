@@ -84,12 +84,11 @@ public class ReservationOptionTest extends TestCase {
         assertEquals("The returned price does not match Coach", 70.37, res.getPrice("Coach") );
         assertEquals("The returned price does not match First Class", 211.33, res.getPrice("FirstClass") );
         assertEquals("The returned total time does not match", "13:25", res.getTotalTime() );
-
     }
     
 
     /**
-     * test the positive scenarios of the class
+     * test the empty scenarios of the class
      */
     public void testReservationOptionEmpty()
     {
@@ -103,6 +102,52 @@ public class ReservationOptionTest extends TestCase {
         assertEquals("The returned price is not 0.00", 0.00, res.getPrice("Coach") );
         assertEquals("The returned price is not 0.00", 0.00, res.getPrice("FirstClass") );
         assertEquals("The returned total time is not 00:00", "00:00", res.getTotalTime() );
-
+    }
+    
+    /**
+     * test the empty scenarios of the class
+     */
+    public void testReservationOptionNull()
+    {
+    	ReservationOption res = new ReservationOption(null);
+    	
+        assertEquals("The returned flight is not null", null, res.getFlight(0) );
+        assertEquals("The returned flight is not null", null, res.getFlight(1) );
+        assertEquals("The returned flight is not null", null, res.getFlight(2) );
+        assertEquals("The returned # of flights is not 0", 0, res.getNumFlights() );
+        assertEquals("The returned # of layovers is not 0", 0, res.getNumLayovers() );
+        assertEquals("The returned price is not 0.00", 0.00, res.getPrice("Coach") );
+        assertEquals("The returned price is not 0.00", 0.00, res.getPrice("FirstClass") );
+        assertEquals("The returned total time is not 00:00", "00:00", res.getTotalTime() );
+    }
+    
+    /**
+     * test the malformed string scenarios of the class
+     */
+    public void testReservationOptionFormat() {
+    	Flight f1 = new Flight(
+    			"A320",
+    			"25",
+    			"2807",
+    			"BOS",
+    			"May 10 2016 00:05 GMT",
+    			"LGA",
+    			"May 10 2016 00:30 GMT",
+    			"$67.11",
+    			9,
+    			"$18.79",
+    			85
+    			);
+    	ArrayList<Flight> list = new ArrayList<Flight>();
+    	list.add(f1);
+    	ReservationOption res = new ReservationOption(list);
+        assertEquals("The returned flight is not a match", f1, res.getFlight(0) );
+        assertEquals("The returned flight is not null", null, res.getFlight(1) );
+        assertEquals("The returned flight is not null", null, res.getFlight(2) );
+        assertEquals("The returned # of flights is not 1", 1, res.getNumFlights() );
+        assertEquals("The returned # of layovers is not 0", 0, res.getNumLayovers() );
+        assertEquals("The returned price is not a match", 18.79, res.getPrice("Coach") );
+        assertEquals("The returned price is not a match", 67.11, res.getPrice("FirstClass") );
+        assertEquals("The returned total time is not INVALID", "INVALID", res.getTotalTime() );
     }
 }
