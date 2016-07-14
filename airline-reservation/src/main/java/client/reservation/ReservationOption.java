@@ -5,6 +5,8 @@ package client.reservation;
 
 import client.flight.*;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -165,7 +167,7 @@ public class ReservationOption {
 	public double getPrice(String seatPreference) {
 		double totalPrice = 0.0;
 		boolean firstClass = false;
-		if(seatPreference.equals("firstclass")) {
+		if(seatPreference.equals("FirstClass")) {
 			firstClass = true;
 		} else {
 			firstClass = false;
@@ -181,7 +183,7 @@ public class ReservationOption {
 				totalPrice += Double.parseDouble(price);
 			}
 		}
-		return totalPrice;
+		return round(totalPrice, 2);
 	}
 	/**
 	 * get total travel time of the reservation option
@@ -206,5 +208,13 @@ public class ReservationOption {
 				TimeUnit.MILLISECONDS.toHours(totalTime),
 				TimeUnit.MILLISECONDS.toMinutes(totalTime) % TimeUnit.HOURS.toMinutes(1)
 				);
+	}
+	
+	private double round(double value, int places) {
+	    if (places < 0) throw new IllegalArgumentException();
+
+	    BigDecimal bd = new BigDecimal(value);
+	    bd = bd.setScale(places, RoundingMode.HALF_UP);
+	    return bd.doubleValue();
 	}
 }

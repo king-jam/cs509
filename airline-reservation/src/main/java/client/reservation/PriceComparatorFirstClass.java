@@ -26,8 +26,8 @@ public class PriceComparatorFirstClass implements Comparator<ReservationOption> 
 	 * @return -1 if less than, 0 if equal, 1 if greater than
 	 */
 	public int compare(ReservationOption r1, ReservationOption r2) {
-		Double price1 = r1.getPrice("firstclass");
-		Double price2 = r2.getPrice("firstclass");
+		Double price1 = r1.getPrice("FirstClass");
+		Double price2 = r2.getPrice("FirstClass");
 		return price1.compareTo(price2);
 	}
 }

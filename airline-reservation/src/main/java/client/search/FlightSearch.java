@@ -156,7 +156,7 @@ public class FlightSearch {
 	 * @return true if constraint is followed else returns false.
 	 */
 	public boolean seatsAvailable(Flight flight) {
-		if(this.mSeatPreference.equals("firstclass")) {
+		if(this.mSeatPreference.equals("FirstClass")) {
 			if(flight.getmSeatsFirstclass() == 0) {
 				return false;
 			}
