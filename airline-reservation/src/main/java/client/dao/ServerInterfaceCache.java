@@ -23,7 +23,8 @@ import client.util.QueryFactory;
 
 
 /**
- * This class provides a cached interface to the CS509 server. It caches requests via ehcache to improve overall speed.
+ * This class provides a cached interface to the CS509 server.
+ * It caches requests via ehcache to improve overall speed.
  *   
  * @author James
  * @version 1

@@ -152,7 +152,6 @@ public class ReservationOption {
 			long arrivalTime = arrivalTimeZoned.toInstant().toEpochMilli();
 			totalTime = arrivalTime - departTime;
 		} catch (DateTimeParseException ex) {
-			ex.printStackTrace();
 			return "INVALID";
 		}
 		return String.format("%02d:%02d",

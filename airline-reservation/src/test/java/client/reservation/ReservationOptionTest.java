@@ -76,14 +76,14 @@ public class ReservationOptionTest extends TestCase {
     	list.add(f3);
     	ReservationOption res = new ReservationOption(list);
     	
-        assertEquals("The returned flight (0) does not match", f1, res.getFlight(0) );
-        assertEquals("The returned flight (1) does not match", f2, res.getFlight(1) );
-        assertEquals("The returned flight (2) does not match", f3, res.getFlight(2) );
-        assertEquals("The returned # of flights does not match", 3, res.getNumFlights() );
-        assertEquals("The returned # of layovers does not match", 2, res.getNumLayovers() );
-        assertEquals("The returned price does not match Coach", 70.37, res.getPrice("Coach") );
-        assertEquals("The returned price does not match First Class", 211.33, res.getPrice("FirstClass") );
-        assertEquals("The returned total time does not match", "13:25", res.getTotalTime() );
+        assertEquals("The returned flight (0) does not match", f1, res.getFlight(0));
+        assertEquals("The returned flight (1) does not match", f2, res.getFlight(1));
+        assertEquals("The returned flight (2) does not match", f3, res.getFlight(2));
+        assertEquals("The returned # of flights does not match", 3, res.getNumFlights());
+        assertEquals("The returned # of layovers does not match", 2, res.getNumLayovers());
+        assertEquals("The returned price does not match Coach", 70.37, res.getPrice("Coach"));
+        assertEquals("The returned price does not match First Class", 211.33, res.getPrice("FirstClass"));
+        assertEquals("The returned total time does not match", "13:25", res.getTotalTime());
     }
     
 
@@ -94,14 +94,14 @@ public class ReservationOptionTest extends TestCase {
     {
     	ReservationOption res = new ReservationOption();
     	
-        assertEquals("The returned flight is not null", null, res.getFlight(0) );
-        assertEquals("The returned flight is not null", null, res.getFlight(1) );
-        assertEquals("The returned flight is not null", null, res.getFlight(2) );
-        assertEquals("The returned # of flights is not 0", 0, res.getNumFlights() );
-        assertEquals("The returned # of layovers is not 0", 0, res.getNumLayovers() );
-        assertEquals("The returned price is not 0.00", 0.00, res.getPrice("Coach") );
-        assertEquals("The returned price is not 0.00", 0.00, res.getPrice("FirstClass") );
-        assertEquals("The returned total time is not 00:00", "00:00", res.getTotalTime() );
+        assertEquals("The returned flight is not null", null, res.getFlight(0));
+        assertEquals("The returned flight is not null", null, res.getFlight(1));
+        assertEquals("The returned flight is not null", null, res.getFlight(2));
+        assertEquals("The returned # of flights is not 0", 0, res.getNumFlights());
+        assertEquals("The returned # of layovers is not 0", 0, res.getNumLayovers());
+        assertEquals("The returned price is not 0.00", 0.00, res.getPrice("Coach"));
+        assertEquals("The returned price is not 0.00", 0.00, res.getPrice("FirstClass"));
+        assertEquals("The returned total time is not 00:00", "00:00", res.getTotalTime());
     }
     
     /**
@@ -111,14 +111,14 @@ public class ReservationOptionTest extends TestCase {
     {
     	ReservationOption res = new ReservationOption(null);
     	
-        assertEquals("The returned flight is not null", null, res.getFlight(0) );
-        assertEquals("The returned flight is not null", null, res.getFlight(1) );
-        assertEquals("The returned flight is not null", null, res.getFlight(2) );
-        assertEquals("The returned # of flights is not 0", 0, res.getNumFlights() );
-        assertEquals("The returned # of layovers is not 0", 0, res.getNumLayovers() );
-        assertEquals("The returned price is not 0.00", 0.00, res.getPrice("Coach") );
-        assertEquals("The returned price is not 0.00", 0.00, res.getPrice("FirstClass") );
-        assertEquals("The returned total time is not 00:00", "00:00", res.getTotalTime() );
+        assertEquals("The returned flight is not null", null, res.getFlight(0));
+        assertEquals("The returned flight is not null", null, res.getFlight(1));
+        assertEquals("The returned flight is not null", null, res.getFlight(2));
+        assertEquals("The returned # of flights is not 0", 0, res.getNumFlights());
+        assertEquals("The returned # of layovers is not 0", 0, res.getNumLayovers());
+        assertEquals("The returned price is not 0.00", 0.00, res.getPrice("Coach"));
+        assertEquals("The returned price is not 0.00", 0.00, res.getPrice("FirstClass"));
+        assertEquals("The returned total time is not 00:00", "00:00", res.getTotalTime());
     }
     
     /**
@@ -141,13 +141,13 @@ public class ReservationOptionTest extends TestCase {
     	ArrayList<Flight> list = new ArrayList<Flight>();
     	list.add(f1);
     	ReservationOption res = new ReservationOption(list);
-        assertEquals("The returned flight is not a match", f1, res.getFlight(0) );
-        assertEquals("The returned flight is not null", null, res.getFlight(1) );
-        assertEquals("The returned flight is not null", null, res.getFlight(2) );
-        assertEquals("The returned # of flights is not 1", 1, res.getNumFlights() );
-        assertEquals("The returned # of layovers is not 0", 0, res.getNumLayovers() );
-        assertEquals("The returned price is not a match", 18.79, res.getPrice("Coach") );
-        assertEquals("The returned price is not a match", 67.11, res.getPrice("FirstClass") );
-        assertEquals("The returned total time is not INVALID", "INVALID", res.getTotalTime() );
+        assertEquals("The returned flight is not a match", f1, res.getFlight(0));
+        assertEquals("The returned flight is not null", null, res.getFlight(1));
+        assertEquals("The returned flight is not null", null, res.getFlight(2));
+        assertEquals("The returned # of flights is not 1", 1, res.getNumFlights());
+        assertEquals("The returned # of layovers is not 0", 0, res.getNumLayovers());
+        assertEquals("The returned price is not a match", 18.79, res.getPrice("Coach"));
+        assertEquals("The returned price is not a match", 67.11, res.getPrice("FirstClass"));
+        assertEquals("The returned total time is not INVALID", "INVALID", res.getTotalTime());
     }
 }
