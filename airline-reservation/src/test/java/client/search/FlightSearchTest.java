@@ -114,6 +114,74 @@ public class FlightSearchTest extends TestCase {
 	}
  
  }
+ /**
+  * testing SeatsAvailable() of class
+  */
+ public void testSeatsAvailable(){
+	//Flight having  FristClass seats >0 and Coach seats>0
+ 	Flight f1 = new Flight(
+			"A320",
+			"25",
+			"2807",
+			"BOS",
+			"2016 May 10 00:05 GMT",
+			"LGA",
+			"2016 May 10 00:30 GMT",
+			"$67.11",
+			9,
+			"$18.79",
+			85
+			);
+ 	//FLight having FirstClass seats =0 and Coach seats=0
+	Flight f2 = new Flight(
+			"737",
+			"25",
+			"2822",
+			"LGA",
+			"2016 May 10 03:05 GMT",
+			"DEN",
+			"2016 May 10 08:30 GMT",
+			"$87.11",
+			0,
+			"$28.79",
+			0
+			);
+	
+	FlightSearch search1=new FlightSearch(null, null, null, "FirstClass");
+	FlightSearch search2=new FlightSearch(null, null, null, "Coach");
+	
+	assertEquals("Expected true as # seats First Class>0",true, search1.seatsAvailable(f1));
+	assertEquals("Expected true as # seats Coach>0",true, search2.seatsAvailable(f1));
+	assertEquals("Expected false as # seats First Class=0",false, search1.seatsAvailable(f2));
+	assertEquals("Expected false as # seats Coach=0",false, search2.seatsAvailable(f2));
+ 
+ }
+ /**
+  * Testing reserveFlight() of class
+  */
+ public void testReserveFlight(){
+	 FlightSearch search1=new FlightSearch("BOS","LGA","2016 May 10 03:05 GMT", "FirstClass");
+	 FlightSearch search2=new FlightSearch("BOS","LGA","2016 May 10 03:05 GMT", "Coach");
+	 //Verifying the seat count increased after using the reservation functionality
+	 try {
+
+		assertEquals("Reservation functionality not working for booking first class seats", true,search1.reserveFlight(search1.getOptions().get(0)));
+		assertEquals("Reservation functionality not working for booking Coach seats", true,search1.reserveFlight(search2.getOptions().get(0)));
+		
+		}
+		
+	 catch (ParseException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+	 
+	 
+	 
+	 
+	 
+ }
+ 
  
 
 }
+
