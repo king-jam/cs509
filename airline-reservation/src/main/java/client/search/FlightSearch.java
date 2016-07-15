@@ -97,7 +97,7 @@ public class FlightSearch {
 	 */
 	public boolean checkNextDayFlight(String arrivalTime) throws ParseException {
 		SimpleDateFormat formatter=new  SimpleDateFormat("yyyy MMM dd HH:mm z");
-		Calendar calendar=GregorianCalendar.getInstance();
+		Calendar calendar=GregorianCalendar.getInstance(TimeZone.getTimeZone("GMT"));;
 		calendar.setTime(formatter.parse(arrivalTime));
 		int hour=calendar.get(Calendar.HOUR_OF_DAY);
 		int minute=calendar.get(Calendar.MINUTE);
@@ -117,7 +117,8 @@ public class FlightSearch {
 	 */
 	public String addOneday(String date) throws ParseException{
 		SimpleDateFormat formatter=new  SimpleDateFormat("yyyy MMM dd HH:mm z");
-		Calendar calendar=GregorianCalendar.getInstance();
+		formatter.setTimeZone(TimeZone.getTimeZone("GMT"));
+		Calendar calendar=GregorianCalendar.getInstance(TimeZone.getTimeZone("GMT"));
 		calendar.setTime(formatter.parse(date));
 		calendar.add(Calendar.DATE, 1);
 		return formatter.format(calendar.getTime());
