@@ -41,7 +41,7 @@ public class QueryFactory {
 	}
 	
 	public static String reset(String ticketAgency){
-		return "team="+ticketAgency+ "&action=resetDB";
+		return "?team="+ticketAgency+ "&action=resetDB";
 	}
 
 }

@@ -377,12 +377,12 @@ public class ServerInterfaceCache {
 			url = new URL(mUrlBase + QueryFactory.reset(team));
 			connection = (HttpURLConnection) url.openConnection();
 			connection.setRequestMethod("GET");
-			connection.setRequestProperty("User-Agent", team);
 			/**
 			 * If response code of SUCCESS read the XML string returned
 			 * 
 			 */
 			int responseCode = connection.getResponseCode();
+			System.out.println("ResponseCode:"+responseCode);
 			if ((responseCode >= 200) && (responseCode <= 299))
 				return true;
 			else

@@ -4,6 +4,8 @@ import java.text.ParseException;
 import java.util.ArrayList;
 
 import client.search.FlightSearch;
+import client.util.Configuration;
+import client.dao.ServerInterfaceCache;
 import client.flight.Flight;
 import client.reservation.ReservationOption;
 import junit.framework.Test;
@@ -160,6 +162,9 @@ public class FlightSearchTest extends TestCase {
   * Testing reserveFlight() of class
   */
  public void testReserveFlight(){
+	 ServerInterfaceCache serverInterfaceCache=ServerInterfaceCache.getInstance();
+	 boolean resetCheck=serverInterfaceCache.resetDB(Configuration.TICKET_AGENCY);
+	 assertEquals("Not able to ResetDB to original state",true,resetCheck);
 	 FlightSearch search1=new FlightSearch("BOS","LGA","2016 May 10 03:05 GMT", "FirstClass");
 	 FlightSearch search2=new FlightSearch("BOS","LGA","2016 May 10 03:05 GMT", "Coach");
 	 //Verifying the seat count increased after using the reservation functionality
