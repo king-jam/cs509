@@ -39,5 +39,9 @@ public class QueryFactory {
 		query = query + "&flightData=" + xmlFlights;
 		return query;
 	}
+	
+	public static String reset(String ticketAgency){
+		return "team="+ticketAgency+ "&action=resetDB";
+	}
 
 }

@@ -9,6 +9,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.ProtocolException;
 import java.net.URL;
 
 import org.ehcache.Cache;
@@ -352,7 +354,53 @@ public class ServerInterfaceCache {
 		this.cacheManager.close();
 	}
 	
+	/**
+	 * Clears the flight cache
+	 * 
+	 */
 	public void clearFlightCache(){
 		this.flightCache.clear();
+	}
+	
+	/**
+	 * Reset the database to its original state
+	 * 
+	 * @param team identifies the team making the request
+	 */
+	public boolean resetDB(String team){
+		URL url;
+		HttpURLConnection connection;
+		/**
+		 * Create an HTTP connection to the server for a GET 
+		 */
+		try {
+			url = new URL(mUrlBase + QueryFactory.reset(team));
+			connection = (HttpURLConnection) url.openConnection();
+			connection.setRequestMethod("GET");
+			connection.setRequestProperty("User-Agent", team);
+			/**
+			 * If response code of SUCCESS read the XML string returned
+			 * 
+			 */
+			int responseCode = connection.getResponseCode();
+			if ((responseCode >= 200) && (responseCode <= 299))
+				return true;
+			else
+				return false;
+		} catch (MalformedURLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return false;
+		} catch (ProtocolException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return false;
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return false;
+		}
+		
+		
 	}
 }
