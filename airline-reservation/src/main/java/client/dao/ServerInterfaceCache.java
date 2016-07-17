@@ -382,7 +382,6 @@ public class ServerInterfaceCache {
 			 * 
 			 */
 			int responseCode = connection.getResponseCode();
-			System.out.println("ResponseCode:"+responseCode);
 			if ((responseCode >= 200) && (responseCode <= 299))
 				return true;
 			else

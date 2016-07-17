@@ -4,6 +4,7 @@ import java.text.ParseException;
 import java.util.ArrayList;
 
 import client.search.FlightSearch;
+import client.ui.ConsoleUI;
 import client.util.Configuration;
 import client.dao.ServerInterfaceCache;
 import client.flight.Flight;
@@ -162,6 +163,8 @@ public class FlightSearchTest extends TestCase {
   * Testing reserveFlight() of class
   */
  public void testReserveFlight(){
+	 //testing whether the getoptions() returns the same no .of results for a set of parameters
+	 //testing whether the first three results match
 	 ServerInterfaceCache serverInterfaceCache=ServerInterfaceCache.getInstance();
 	 boolean resetCheck=serverInterfaceCache.resetDB(Configuration.TICKET_AGENCY);
 	 assertEquals("Not able to ResetDB to original state",true,resetCheck);
@@ -179,12 +182,170 @@ public class FlightSearchTest extends TestCase {
 		// TODO Auto-generated catch block
 		e.printStackTrace();
 	}
+ 
+ }
+ 
+ public void testGetOptions(){
+	 try{ 
+	 ServerInterfaceCache serverInterfaceCache=ServerInterfaceCache.getInstance();
+	 boolean resetCheck=serverInterfaceCache.resetDB(Configuration.TICKET_AGENCY);
+	 assertEquals("Not able to ResetDB to original state",true,resetCheck);
+	 FlightSearch search=new FlightSearch("BOS","LGA","2016 May 11 17:00 GMT", "FirstClass");
+	 ArrayList<ReservationOption> testOptions=new ArrayList<ReservationOption>();
+	 ArrayList<ReservationOption> expectedOptions=search.getOptions();
+	 ArrayList<Flight> list=new ArrayList<Flight>();
+	 Flight f1=new Flight(
+			 "A340",
+			 "103",
+			 "2854",
+			 "BOS",
+			 "2016 May 11 04:05 GMT",
+			 "RDU", 
+			 "2016 May 11 05:48 GMT",
+			 "$242.79",
+			 30, 
+			 "$28.99",
+			 67);
+	 Flight f2=new Flight(
+			 "737",
+			 "58",
+			 "25055",
+			 "RDU",
+			 "2016 May 11 07:58 GMT",
+			 "LGA", 
+			 "2016 May 11 08:56 GMT",
+			 "$157.55",
+			 24, 
+			 "$44.11",
+			 68);
+	 list.add(f1);
+	 list.add(f2);
+	 ReservationOption option=new ReservationOption(list);
+	 testOptions.add(option);
+	 list =new ArrayList<Flight>();
+	 Flight f3=new Flight(
+			 "737",
+			 "32",
+			 "2855",
+			 "BOS",
+			 "2016 May 11 04:32 GMT",
+			 "EWR", 
+			 "2016 May 11 05:04 GMT",
+			 "$86.57",
+			 14, 
+			 "$24.24",
+			 60);
+	 Flight f4=new Flight(
+			 "A340",
+			 "2",
+			 "19952",
+			 "EWR",
+			 "2016 May 11 07:51 GMT",
+			 "LGA", 
+			 "2016 May 11 07:53 GMT",
+			 "$5.56",
+			 17, 
+			 "$0.66",
+			 241);
+	 list.add(f3);
+	 list.add(f4);
+	 
+	 option=new ReservationOption(list);
+	 testOptions.add(option);
+	 list =new ArrayList<Flight>();
+	 
+	 Flight f5=new Flight(
+			 "A310",
+			 "158",
+			 "2859",
+			 "BOS",
+			 "2016 May 11 07:43 GMT",
+			 "TPA", 
+			 "2016 May 11 10:21 GMT",
+			 "$499.78",
+			 23, 
+			 "$59.97",
+			 37);
+	 Flight f6=new Flight(
+			 "767",
+			 "151",
+			 "31381",
+			 "TPA",
+			 "2016 May 11 13:03 GMT",
+			 "LGA", 
+			 "2016 May 11 15:34 GMT",
+			 "$109.90",
+			 6, 
+			 "$57.15",
+			 56); 
+	 list.add(f5);
+	 list.add(f6);
+	 
+	 option=new ReservationOption(list);
+	 testOptions.add(option);
+	 //expecting 8 search results for a given set of parameters
+	 assertEquals("Expected no.of search results different",8,expectedOptions.size());
+	 
+	 for(int i=0;i<testOptions.size();i++){
+		 for(int j=0;j<testOptions.get(i).getNumFlights();j++){
+		  assertEquals((i+1)+" th result not matching",testOptions.get(i).getFlight(j).getmAirplane(),
+				  expectedOptions.get(i).getFlight(j).getmAirplane());
+		  assertEquals((i+1)+" th result not matching",testOptions.get(i).getFlight(j).getmNumber(),
+				  expectedOptions.get(i).getFlight(j).getmNumber());
+		  assertEquals((i+1)+" th result not matching",testOptions.get(i).getFlight(j).getmCodeArrival(),
+				  expectedOptions.get(i).getFlight(j).getmCodeArrival());
+		  assertEquals((i+1)+" th result not matching",testOptions.get(i).getFlight(j).getmCodeDepart(),
+				  expectedOptions.get(i).getFlight(j).getmCodeDepart());
+		  assertEquals((i+1)+" th result not matching",testOptions.get(i).getFlight(j).getmTimeDepart(),
+				  expectedOptions.get(i).getFlight(j).getmTimeDepart());
+		  
+		 }
+	 }
+	 
+	 }
+	 catch (ParseException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
 	 
 	 
 	 
 	 
+/*	 Flight F;
+	 
+
+	 try {
+		ArrayList<ReservationOption> options=search.getOptions();
+		for(int i=0;i<options.size();i++){
+			option=options.get(i);
+			for(int j=0;j<option.getNumFlights();j++){
+				F=option.getFlight(j);
+				System.out.println(F.getmAirplane());
+				System.out.println(F.getmFlightTime());
+				System.out.println(F.getmNumber());
+				System.out.println(F.getmCodeDepart());
+				System.out.println(F.getmTimeDepart());
+				System.out.println(F.getmCodeArrival());
+				System.out.println(F.getmTimeArrival());
+				System.out.println(F.getmPriceFirstclass());
+				System.out.println(F.getmSeatsFirstclass());
+				System.out.println(F.getmPriceCoach());
+				System.out.println(F.getmSeatsCoach());
+				System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+	
+			}
+			System.out.println("-----------------------------------");
+			
+		}
+	} catch (ParseException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}*/
 	 
  }
+ 
+ 
+ 
  
  
 
