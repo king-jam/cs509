@@ -1,12 +1,6 @@
 package client.dao;
 
 import java.text.ParseException;
-import java.util.ArrayList;
-
-import org.ehcache.Cache;
-
-import client.flight.Flight;
-import client.reservation.ReservationOptionTest;
 import client.search.FlightSearch;
 import client.util.Configuration;
 import junit.framework.Test;
