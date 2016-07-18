@@ -166,8 +166,10 @@ public class FlightSearchTest extends TestCase {
 	 //testing whether the getoptions() returns the same no .of results for a set of parameters
 	 //testing whether the first three results match
 	 ServerInterfaceCache serverInterfaceCache=ServerInterfaceCache.getInstance();
+	 //reseting the database to its original state
 	 boolean resetCheck=serverInterfaceCache.resetDB(Configuration.TICKET_AGENCY);
 	 assertEquals("Not able to ResetDB to original state",true,resetCheck);
+	 
 	 FlightSearch search1=new FlightSearch("BOS","LGA","2016 May 10 03:05 GMT", "FirstClass");
 	 FlightSearch search2=new FlightSearch("BOS","LGA","2016 May 10 03:05 GMT", "Coach");
 	 //Verifying the seat count increased after using the reservation functionality
