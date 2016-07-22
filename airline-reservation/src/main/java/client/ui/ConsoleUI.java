@@ -9,7 +9,6 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Scanner;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -17,9 +16,12 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import client.airport.Airport;
 import client.airport.Airports;
+import client.airport.CodeComparator;
 import client.dao.*;
 import client.flight.Flight;
 import client.reservation.*;
@@ -38,26 +40,59 @@ public class ConsoleUI {
 	 * Global Data attributes for a ConsoleUI
 	 */
 	private static final String quitKeyword = "q";
+	public static Airports airports = new Airports();
 	/**
 	 * prints a formatted ReservationOption for display
 	 * 
 	 * @param option contains the ReservationOption 
 	 * @param seatPreference contains the client seat preference for price display
+	 * @throws Exception 
 	 * 
 	 */
-	public static void printReservationOption(ReservationOption option, String seatPreference) {
+	public static void printReservationOption(ReservationOption option, String seatPreference) throws Exception {
 		Flight flight;
+		String startTime = "";
+		String endTime = "";
+		TimeLocal timeLocal = new TimeLocal(Configuration.getInstance().getGoogleTimezoneAPIKey());
 		for(int j = 0; j < option.getNumFlights(); j++){
 			flight=option.getFlight(j);
 			System.out.print("\t"+flight.getmNumber()+"\t"+flight.getmCodeDepart()+
 					"--->"+flight.getmCodeArrival());
-			System.out.println("\t"+flight.getmTimeDepart()+" - "+flight.getmTimeArrival());
+			Airport depAirport = getAirportFromCode(flight.getmCodeDepart());
+			Airport arrAirport = getAirportFromCode(flight.getmCodeArrival());
+			String departTime = timeLocal.getLocalTime(flight.getmTimeDepart(), depAirport.timezone());
+			String arrivalTime = timeLocal.getLocalTime(flight.getmTimeArrival(), arrAirport.timezone());
+			//System.out.println("\t"+flight.getmTimeDepart()+" - "+flight.getmTimeArrival());
+			System.out.println("\t"+departTime+" - "+arrivalTime);
+			if(j == 0) {
+				startTime = departTime;
+			}
+			if(j == option.getNumFlights()-1) {
+				endTime = arrivalTime;
+			}
 		}
 
-		System.out.println("\tDeparture: "+option.getFlight(0).getmTimeDepart());
-		System.out.println("\tArrival: "+option.getFlight(option.getNumFlights()-1).getmTimeArrival());
+		//System.out.println("\tDeparture: "+option.getFlight(0).getmTimeDepart());
+		//System.out.println("\tArrival: "+option.getFlight(option.getNumFlights()-1).getmTimeArrival());
+		System.out.println("\tDeparture: "+startTime);
+		System.out.println("\tArrival: "+endTime);
 		System.out.println("\tTotal Travel Time: "+option.getTotalTime());
 		System.out.println("\tTotal Price: $"+String.format( "%.2f", option.getPrice(seatPreference) ));
+	}
+	/**
+	 * Returns an airport object from the airport code
+	 * 
+	 * @param code contains the three letter airport code 
+	 * @return Airport object for reference
+	 */
+	public static Airport getAirportFromCode(String code) {
+		int index = Collections.binarySearch(airports,
+				new Airport("", code, 0.0, 0.0),
+				new CodeComparator());
+		if(index < 0) {
+			return null;
+		}
+		return airports.get(index);
 	}
 	/**
 	 * prints an invalid selection message and pauses for client to see it
@@ -136,10 +171,11 @@ public class ConsoleUI {
 	}
 	/**
 	 * main runner function to take user input, search for flights, and display options
+	 * @throws Exception 
 	 * 
 	 */
-	public static void main(String[] args) throws ParseException {
-
+	public static void main(String[] args) throws Exception {
+		Logger.getLogger("").setLevel(Level.OFF); 
 		String mDepartureAirportCode = "";
 		String mArrivalAirportCode = "";
 		boolean mOneWay = false;
@@ -148,16 +184,18 @@ public class ConsoleUI {
 		String mReturnDate = "";
 		ArrayList<ReservationOption> selectedOptions = new ArrayList<ReservationOption>();
 		ServerInterfaceCache mServerInterface = ServerInterfaceCache.getInstance();
-		Airports airports = new Airports();
 		ExecutorService executor = Executors.newWorkStealingPool();
-		String airportData = mServerInterface.getAirports(Configuration.getAgency());
-		airports.addAll(airportData);
-		Collections.sort(airports, new Comparator<Airport>() {
-			public int compare(Airport airport1, Airport airport2)
-			{
-				return  airport1.code().compareTo(airport2.code());
+		Callable<Airports> apTask = () -> {
+			Airports aps = new Airports();
+			String airportData = mServerInterface.getAirports(Configuration.getAgency());
+			aps.addAll(airportData);
+			for(Airport ap:aps) {
+				ap.timezoneGoogle();
 			}
-		});
+			Collections.sort(aps, new CodeComparator());
+			return aps;
+		};
+		Future<Airports> airportFuture = executor.submit(apTask);
 
 		Scanner scan = new Scanner(System.in);
 
@@ -177,6 +215,13 @@ public class ConsoleUI {
 			while(!inputReady) {
 				boolean depAirport = false;
 				while(!depAirport) {
+					try {
+						airports = airportFuture.get();
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					} catch (ExecutionException e) {
+						e.printStackTrace();
+					}
 					System.out.println("\tDEPARTURE AIRPORTS");
 					for(int i = 0; i < airports.size(); i++) {
 						System.out.printf("%d:\t%s\t%s\n",i+1,airports.get(i).code(),airports.get(i).name());

@@ -47,7 +47,7 @@ public class Airplanes extends ArrayList<Airplane> {
 		boolean collectionUpdated = false;
 		
 		// Load the XML string into a DOM tree for ease of processing
-		// then iterate over all nodes adding each airport to our collection
+		// then iterate over all nodes adding each airplane to our collection
 		Document docAirplanes = buildDomDoc (xmlAirplanes);
 		NodeList nodesAirplanes = docAirplanes.getElementsByTagName("Airplane");
 		
@@ -132,7 +132,7 @@ public class Airplanes extends ArrayList<Airplane> {
 		coachSeats = Integer.parseInt(getCharacterDataFromElement(seat));
 
 		/**
-		 * Update the Airport object with values from XML node
+		 * Update the Airplane object with values from XML node
 		 */
 		airplane.manufacturer(manufacturer);
 		airplane.model(model);

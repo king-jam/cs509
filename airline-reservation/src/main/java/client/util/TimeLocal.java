@@ -32,7 +32,7 @@ public class TimeLocal {
 				.setWriteTimeout(1, TimeUnit.SECONDS);
 	};
 
-	public String getLocalTime(String gmtTime, double latitude, double longitude) throws Exception {
+	public String getLocalTimeLatLng(String gmtTime, double latitude, double longitude) throws Exception {
 		TimeZone tz = null;
 		String localTime = "";
 		LatLng location = new LatLng(latitude,longitude);
@@ -53,4 +53,25 @@ public class TimeLocal {
 		return localTime;
 	}
 
+	public TimeZone getTimeZone(double latitude, double longitude) throws Exception {
+		TimeZone tz = null;
+		LatLng location = new LatLng(latitude,longitude);
+		PendingResult<TimeZone> result = TimeZoneApi.getTimeZone(this.context, location);
+		try {
+			tz = result.await();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return tz;
+	}
+
+	public String getLocalTime(String gmtTime, TimeZone tz) throws Exception {
+		String localTime = "";
+		DateTimeFormatter flightDateFormat = DateTimeFormatter.ofPattern("yyyy MMM d HH:mm z");
+		LocalDateTime timeLocal = LocalDateTime.parse(gmtTime,flightDateFormat);
+		ZonedDateTime timeZoned = timeLocal.atZone(ZoneId.of("GMT"));
+		ZonedDateTime newTimeZoned = timeZoned.withZoneSameInstant(tz.toZoneId());
+		localTime = newTimeZoned.format(flightDateFormat);
+		return localTime;
+	}
 }

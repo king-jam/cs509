@@ -3,14 +3,19 @@
  */
 package client.airport;
 
+import java.util.TimeZone;
+
+import client.util.Configuration;
+import client.util.TimeLocal;
+
 /**
  * This class holds values pertaining to a single Airport. Class member attributes
  * are the same as defined by the CS509 server API and store values after conversion from
  * XML received from the server to Java primitives. Attributes are accessed via getter and 
  * setter methods.
  * 
- * @author blake
- * @version 1.1
+ * @author James
+ * @version 1.2
  * @since 2016-02-24
  *
  */
@@ -29,6 +34,7 @@ public class Airport {
 	 */
 	private String mName;              // Full name of the airport
 	private String mCode;              // Three character code of the airport
+	private TimeZone mTimeZone;        // Timezone of the airport
 	private double mLatitude;          // Latitude of airport in decimal format
 	private double mLongitude;         // Longitude of the airport in decimal format
 	
@@ -44,6 +50,7 @@ public class Airport {
 	public Airport () {
 		mName = "";
 		mCode = "";
+		mTimeZone = null;
 		mLatitude = Double.MAX_VALUE;
 		mLongitude = Double.MAX_VALUE;
 	}
@@ -64,6 +71,7 @@ public class Airport {
 	public Airport (String name, String code, double latitude, double longitude) {
 		mName = name;
 		mCode = code;
+		mTimeZone = null;
 		mLatitude = latitude;
 		mLongitude = longitude;
 	}
@@ -118,6 +126,38 @@ public class Airport {
 	 */
 	public String code () {
 		return mCode;
+	}
+	
+	/**
+	 * set the airport timezone from Google API
+	 */
+	public void timezoneGoogle () {
+		TimeZone tz = null;
+		TimeLocal timeLocal = new TimeLocal(Configuration.getInstance().getGoogleTimezoneAPIKey());
+		try {
+			tz = timeLocal.getTimeZone(this.mLatitude, this.mLongitude);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		mTimeZone = tz;
+	}
+	
+	/**
+	 * set the airport timezone
+	 * 
+	 * @param tz The timezone code for the airport
+	 */
+	public void timezone (TimeZone tz) {
+		mTimeZone = tz;
+	}
+	
+	/**
+	 * Get the timezone of the airport
+	 * 
+	 * @return The timezone of the airport
+	 */
+	public TimeZone timezone () {
+		return mTimeZone;
 	}
 	
 	/**
@@ -192,7 +232,7 @@ public class Airport {
 	}
 	
 	/**
-	 * Determine if object instance has valid attribute data
+	 * Determine if object instance has valid attribute data per the server return value
 	 * 
 	 * Verifies the name is not null and not an empty string. Verifies code is 3 characters in length.
 	 * Verifies latitude is between +90.0 north pole and -90.0 south pole.

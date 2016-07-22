@@ -175,13 +175,13 @@ public class ReservationOption {
 				TimeUnit.MILLISECONDS.toMinutes(totalTime) % TimeUnit.HOURS.toMinutes(1)
 				);
 	}
-
-	private double round(double value, int places) {
-		BigDecimal bd = new BigDecimal(value);
-		bd = bd.setScale(places, RoundingMode.HALF_UP);
-		return bd.doubleValue();
-	}
-	
+	/**
+	 * Reserves all flights associated with this reservation.
+	 * 
+	 * @param mSeatPreference is the seating type preference to reserve
+	 * @return true or false based on if the reservation was successful
+	 * 
+	 */
 	public boolean reserveFlights(String mSeatPreference){
 		//get the lock to the DB
 		ServerInterfaceCache mServerInterface = ServerInterfaceCache.getInstance();
@@ -228,5 +228,11 @@ public class ReservationOption {
 			mServerInterface.unlock(Configuration.TICKET_AGENCY);
 			return false;
 		}
+	}
+	
+	private double round(double value, int places) {
+		BigDecimal bd = new BigDecimal(value);
+		bd = bd.setScale(places, RoundingMode.HALF_UP);
+		return bd.doubleValue();
 	}
 }
