@@ -34,36 +34,36 @@ import client.util.QueryFactory;
  *
  */
 public class ServerInterfaceCache {
-	
+
 	private final String mUrlBase = "http://cs509.cs.wpi.edu:8181/CS509.server/ReservationSystem";
 	private CacheManager cacheManager;
 	private Cache<String, String> airportCache;
 	private Cache<String, String> flightCache;
-	
+
 	private static ServerInterfaceCache instance; 
-	
+
 	public static ServerInterfaceCache getInstance(){
 		if(instance==null)
 			instance=new ServerInterfaceCache();
 		return instance;
 	}
-	
+
 	private ServerInterfaceCache() {
 		this.cacheManager = CacheManagerBuilder.newCacheManagerBuilder().withCache("airports",
-			    CacheConfigurationBuilder.newCacheConfigurationBuilder(String.class, String.class,
-			        ResourcePoolsBuilder.newResourcePoolsBuilder()
-			            .heap(10, EntryUnit.ENTRIES)
-			            .offheap(10, MemoryUnit.MB)) 
-			        )
-			    .build(true);
+				CacheConfigurationBuilder.newCacheConfigurationBuilder(String.class, String.class,
+						ResourcePoolsBuilder.newResourcePoolsBuilder()
+						.heap(10, EntryUnit.ENTRIES)
+						.offheap(10, MemoryUnit.MB)) 
+				)
+				.build(true);
 		this.airportCache = this.cacheManager.getCache("airports", String.class, String.class);
 		this.flightCache = this.cacheManager.createCache("flights", 
-			    CacheConfigurationBuilder.newCacheConfigurationBuilder(String.class, String.class, 
-			    		ResourcePoolsBuilder.newResourcePoolsBuilder()
-			    		.heap(10, EntryUnit.ENTRIES)
-			    		.offheap(10, MemoryUnit.MB)).build());
+				CacheConfigurationBuilder.newCacheConfigurationBuilder(String.class, String.class, 
+						ResourcePoolsBuilder.newResourcePoolsBuilder()
+						.heap(10, EntryUnit.ENTRIES)
+						.offheap(10, MemoryUnit.MB)).build());
 	}
-	
+
 	/**
 	 * Return an XML list of all the airports
 	 * 
@@ -88,7 +88,7 @@ public class ServerInterfaceCache {
 				url = new URL(mUrlBase + QueryFactory.getAirports(team));
 				connection = (HttpURLConnection) url.openConnection();
 				connection.setRequestMethod("GET");
-	
+
 				/**
 				 * If response code of SUCCESS read the XML string returned
 				 * line by line to build the full return string
@@ -98,7 +98,7 @@ public class ServerInterfaceCache {
 					InputStream inputStream = connection.getInputStream();
 					String encoding = connection.getContentEncoding();
 					encoding = (encoding == null ? "URF-8" : encoding);
-	
+
 					reader = new BufferedReader(new InputStreamReader(inputStream));
 					while ((line = reader.readLine()) != null) {
 						result.append(line);
@@ -116,7 +116,7 @@ public class ServerInterfaceCache {
 		}
 		return res;
 	}
-	
+
 	/**
 	 * Return XML string identifying flights departing specified airport on specified day
 	 * 
@@ -127,7 +127,7 @@ public class ServerInterfaceCache {
 	 * @return the XML string returned from the server
 	 */
 	public String getFlights (String team, String airportCode, String day) {
-		
+
 		URL url;
 		HttpURLConnection connection;
 		BufferedReader reader;
@@ -144,7 +144,7 @@ public class ServerInterfaceCache {
 				connection = (HttpURLConnection) url.openConnection();
 				connection.setRequestMethod("GET");
 				connection.setRequestProperty("User-Agent", team);
-	
+
 				/**
 				 * If response code of SUCCESS read the XML string returned
 				 * line by line to build the full return string
@@ -154,7 +154,7 @@ public class ServerInterfaceCache {
 					InputStream inputStream = connection.getInputStream();
 					String encoding = connection.getContentEncoding();
 					encoding = (encoding == null ? "URF-8" : encoding);
-	
+
 					reader = new BufferedReader(new InputStreamReader(inputStream));
 					while ((line = reader.readLine()) != null) {
 						result.append(line);
@@ -172,7 +172,7 @@ public class ServerInterfaceCache {
 		}
 		return res;
 	}
-	
+
 	/**
 	 * Lock the server database in preparation to making a reservation
 	 * 
@@ -190,35 +190,31 @@ public class ServerInterfaceCache {
 			connection.setRequestMethod("POST");
 			connection.setRequestProperty("User-Agent", team);
 			connection.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
-			
+
 			String params = QueryFactory.lock(team);
-			
+
 			connection.setDoOutput(true);
 			DataOutputStream writer = new DataOutputStream(connection.getOutputStream());
 			writer.writeBytes(params);
 			writer.flush();
 			writer.close();
-			
-			int responseCode = connection.getResponseCode();
-			System.out.println("\nSending 'POST' to lock database");
-			System.out.println(("\nResponse Code : " + responseCode));
-			
+
+			//int responseCode = connection.getResponseCode();
+
 			BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
 			String line;
 			StringBuffer response = new StringBuffer();
-			
+
 			while ((line = in.readLine()) != null) {
 				response.append(line);
 			}
 			in.close();
-			
-			System.out.println(response.toString());
 		}
 		catch (Exception ex) {
 			ex.printStackTrace();
 			return false;
 		}
-		
+
 		return true;
 	}
 
@@ -232,25 +228,23 @@ public class ServerInterfaceCache {
 	public boolean unlock (String team) {
 		URL url;
 		HttpURLConnection connection;
-		
+
 		try {
 			url = new URL(mUrlBase);
 			connection = (HttpURLConnection) url.openConnection();
 			connection.setRequestMethod("POST");
-			
+
 			String params = QueryFactory.unlock(team);
-			
+
 			connection.setDoOutput(true);
 			connection.setDoInput(true);
-			
+
 			DataOutputStream writer = new DataOutputStream(connection.getOutputStream());
 			writer.writeBytes(params);
 			writer.flush();
 			writer.close();
-		    
+
 			int responseCode = connection.getResponseCode();
-			System.out.println("\nSending 'POST' to unlock database");
-			System.out.println(("\nResponse Code : " + responseCode));
 
 			if ((responseCode >= 200) && (responseCode <= 299)) {
 				BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
@@ -261,8 +255,6 @@ public class ServerInterfaceCache {
 					response.append(line);
 				}
 				in.close();
-
-				System.out.println(response.toString());
 			}
 		}
 		catch (IOException ex) {
@@ -298,20 +290,15 @@ public class ServerInterfaceCache {
 
 			String params = QueryFactory.reserve(team, xmlReservation);
 
-			System.out.println("\nSending 'POST' to ReserveFlights");
-			System.out.println("\nSending " + params);
-			
 			connection.setDoOutput(true);
 			connection.setDoInput(true);
-			
+
 			DataOutputStream writer = new DataOutputStream(connection.getOutputStream());
 			writer.writeBytes(params);
 			writer.flush();
 			writer.close();
-			
+
 			int responseCode = connection.getResponseCode();
-			System.out.println("\nSending 'POST' to ReserveFlights");
-			System.out.println(("\nResponse Code : " + responseCode));
 
 			if ((responseCode >= 200) && (responseCode <= 299)) {
 				BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
@@ -323,8 +310,6 @@ public class ServerInterfaceCache {
 				}
 				in.close();
 
-				System.out.println(response.toString());
-				
 				return true;
 			} else {
 				BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
@@ -336,7 +321,6 @@ public class ServerInterfaceCache {
 				}
 				in.close();
 
-				System.out.println(response.toString());
 				return false;
 			}
 		}
@@ -349,11 +333,11 @@ public class ServerInterfaceCache {
 			return false;
 		}
 	}
-	
+
 	protected void finalize() throws Throwable {
 		this.cacheManager.close();
 	}
-	
+
 	/**
 	 * Clears the flight cache
 	 * 
@@ -361,7 +345,7 @@ public class ServerInterfaceCache {
 	public void clearFlightCache(){
 		this.flightCache.clear();
 	}
-	
+
 	/**
 	 * Reset the database to its original state
 	 * 
@@ -399,7 +383,7 @@ public class ServerInterfaceCache {
 			e.printStackTrace();
 			return false;
 		}
-		
-		
+
+
 	}
 }

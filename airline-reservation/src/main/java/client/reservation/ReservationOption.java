@@ -30,7 +30,7 @@ public class ReservationOption {
 	 * Data attributes for a ReservationOption
 	 */
 	private ArrayList<Flight> flightList;
-	
+
 	/**
 	 * default constructor
 	 * 
@@ -138,7 +138,7 @@ public class ReservationOption {
 	 * @return the total travel time from start to finish in hours:minutes format
 	 */
 	public String getTotalTime() {
-		DateTimeFormatter flightDateFormat = DateTimeFormatter.ofPattern("yyyy MMM d H:m z");
+		DateTimeFormatter flightDateFormat = DateTimeFormatter.ofPattern("yyyy MMM d HH:mm z");
 		long totalTime = 0;
 		if (this.flightList == null || this.flightList.size() == 0) {
 			return "00:00";
@@ -159,10 +159,10 @@ public class ReservationOption {
 				TimeUnit.MILLISECONDS.toMinutes(totalTime) % TimeUnit.HOURS.toMinutes(1)
 				);
 	}
-	
+
 	private double round(double value, int places) {
-	    BigDecimal bd = new BigDecimal(value);
-	    bd = bd.setScale(places, RoundingMode.HALF_UP);
-	    return bd.doubleValue();
+		BigDecimal bd = new BigDecimal(value);
+		bd = bd.setScale(places, RoundingMode.HALF_UP);
+		return bd.doubleValue();
 	}
 }

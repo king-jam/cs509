@@ -16,7 +16,7 @@ import java.util.Comparator;
  *
  */
 public class PriceComparatorFirstClass implements Comparator<ReservationOption> {
-	
+
 	/**
 	 * compare function of ReservationOption class based on first class prices.
 	 * 

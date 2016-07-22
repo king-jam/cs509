@@ -13,7 +13,7 @@ import client.reservation.*;
  * @since 06/28/2016
  */
 public class FlightSearchSorter {
-	
+
 	/**
 	 * This method takes a list of ReservationOption objects and sorts them
 	 * based on price in ascending or descending order depending on input

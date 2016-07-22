@@ -134,7 +134,7 @@ public class FlightSearch {
 	 */
 	public boolean isValidLayover(String arrivalTime,String departureTime) throws ParseException{
 		long layover = 0;
-		DateTimeFormatter flightDateFormat = DateTimeFormatter.ofPattern("yyyy MMM d H:m z");
+		DateTimeFormatter flightDateFormat = DateTimeFormatter.ofPattern("yyyy MMM d HH:mm z");
 		LocalDateTime departTimeLocal = LocalDateTime.parse(departureTime,flightDateFormat);
 		ZonedDateTime departTimeZoned = departTimeLocal.atZone(ZoneId.of("GMT"));
 		long dTime = departTimeZoned.toInstant().toEpochMilli();
@@ -168,7 +168,7 @@ public class FlightSearch {
 		}
 		return true;
 	}
-	
+
 	/**
 	 * This method uses the server interface to get flight information and then add it to a collection.
 	 * 
@@ -208,7 +208,7 @@ public class FlightSearch {
 		if(this.mDepartureAirportCode.equals(this.mArrivalAirportCode)) {
 			return reservedOptions;
 		}
-		
+
 		addFlights(this.mDepartureAirportCode,dateFormatter(this.mDepartureDate),outboundflights);
 		for(int i = 0; i < outboundflights.size(); i++) {
 			ArrayList<Flight> option=new ArrayList<Flight>(Configuration.MAX_LAYOVER+1);
@@ -251,7 +251,7 @@ public class FlightSearch {
 		}
 		return reservedOptions;
 	}
-	
+
 	public boolean reserveFlight(ReservationOption selectedOption){
 		//get the lock to the DB
 		if(!mServerInterface.lock(Configuration.TICKET_AGENCY)){
@@ -259,8 +259,8 @@ public class FlightSearch {
 			return false;
 		}
 		//creating a XML string of flight data
-		 DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-		 try {
+		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+		try {
 			Flight flight;
 			Element flight_xml;
 			DocumentBuilder db = dbf.newDocumentBuilder();
@@ -275,25 +275,24 @@ public class FlightSearch {
 				flight_xml.setAttribute("number",flight.getmNumber());
 				flight_xml.setAttribute("seating",this.mSeatPreference);
 				root.appendChild(flight_xml);
-				}
+			}
 			TransformerFactory tf = TransformerFactory.newInstance();
 			Transformer transformer = tf.newTransformer();
 			transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
 			StringWriter writer = new StringWriter();
 			transformer.transform(new DOMSource(document), new StreamResult(writer));
-			System.out.println("Xml filght data"+writer.toString());
-			
+
 			if(mServerInterface.buyTickets(Configuration.TICKET_AGENCY,writer.toString())){
 				mServerInterface.unlock(Configuration.TICKET_AGENCY);
 				return true;
-			 }
+			}
 			else{
 				mServerInterface.unlock(Configuration.TICKET_AGENCY);
 				mServerInterface.clearFlightCache();
 				return false;
 			}
-		
-		 } catch (ParserConfigurationException e) {
+
+		} catch (ParserConfigurationException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return false;
@@ -302,7 +301,5 @@ public class FlightSearch {
 			e.printStackTrace();
 			return false;
 		}
-
 	}
-	
 }

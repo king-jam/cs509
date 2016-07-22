@@ -216,7 +216,7 @@ public class ConsoleUI {
 					String in2 = scan.nextLine();
 					String departDate = in1 + in2 + " GMT";
 					exitCheck(departDate);
-					DateTimeFormatter flightDateFormat= DateTimeFormatter.ofPattern("yyyy MMM d H:m z");
+					DateTimeFormatter flightDateFormat= DateTimeFormatter.ofPattern("yyyy MMM d HH:mm z");
 					try {
 						@SuppressWarnings("unused")
 						LocalDateTime departTimeLocal = LocalDateTime.parse(departDate,flightDateFormat);
@@ -290,7 +290,7 @@ public class ConsoleUI {
 						String in2 = scan.nextLine();
 						String returnDate = in1 + in2 + " GMT";
 						exitCheck(returnDate);
-						DateTimeFormatter flightDateFormat= DateTimeFormatter.ofPattern("yyyy MMM d H:m z");
+						DateTimeFormatter flightDateFormat= DateTimeFormatter.ofPattern("yyyy MMM d HH:mm z");
 						try {
 							@SuppressWarnings("unused")
 							LocalDateTime departTimeLocal = LocalDateTime.parse(returnDate,flightDateFormat);

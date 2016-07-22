@@ -8,15 +8,15 @@ package client.util;
  *
  */
 public class QueryFactory {
-	
+
 	public static String getAirports(String ticketAgency) {
 		return "?team=" + ticketAgency + "&action=list&list_type=airports";
 	}
-	
+
 	public static String getAirplanes(String ticketAgency) {
 		return "?team=" + ticketAgency + "&action=list&list_type=airplanes";
 	}
-	
+
 	public static String getFlightsDeparting(String team, String airportCode, String day) {
 		String query = "?team=" + team;
 		query = query + "&action=list";
@@ -28,18 +28,18 @@ public class QueryFactory {
 	public static String lock (String ticketAgency) {
 		return "team=" + ticketAgency + "&action=lockDB";
 	}
-	
+
 	public static String unlock (String ticketAgency) {
 		return "team=" + ticketAgency + "&action=unlockDB";
 	}
-	
+
 	public static String reserve (String ticketAgency, String xmlFlights) {
 		String query = "team=" + ticketAgency;
 		query = query + "&action=buyTickets";
 		query = query + "&flightData=" + xmlFlights;
 		return query;
 	}
-	
+
 	public static String reset(String ticketAgency){
 		return "?team="+ticketAgency+ "&action=resetDB";
 	}

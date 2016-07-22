@@ -42,6 +42,7 @@ public final class Configuration {
 	public static final long MAX_LAYOVER_TIME=3*3600*1000;//in milli seconds
 	public static final long MIN_LAYOVER_TIME=1800*1000;//in milli seconds
 	public static final int DAY_HOUR_NEXT_FLIGHT=21;//in 24 hr format,9:00pm
+	public static final String TIMEZONE_API_KEY="AIzaSyBAtSOEGDXRnjrlxqdrtVa4cLsY1mBbOjM";
 	/**
 	 * get the ticket agency string
 	 * 
@@ -81,5 +82,8 @@ public final class Configuration {
 	 */
 	public static int getDayHourNextFlight() {
 		return DAY_HOUR_NEXT_FLIGHT;
+	}
+	public String getGoogleTimezoneAPIKey() {
+		return TIMEZONE_API_KEY;
 	}
 }
