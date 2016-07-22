@@ -27,7 +27,7 @@ import client.search.FlightSearch;
 import client.search.FlightSearchSorter;
 import client.util.*;
 /**
- * This class is a debug runner UI for testing and validation full functionality.
+ * This class is a debug runner UI for testing and validating full functionality.
  * 
  * @author James
  * @version 1
@@ -216,7 +216,7 @@ public class ConsoleUI {
 					String in2 = scan.nextLine();
 					String departDate = in1 + in2 + " GMT";
 					exitCheck(departDate);
-					DateTimeFormatter flightDateFormat= DateTimeFormatter.ofPattern("yyyy MMM d HH:mm z");
+					DateTimeFormatter flightDateFormat= DateTimeFormatter.ofPattern("yyyy MMM d H:m z");
 					try {
 						@SuppressWarnings("unused")
 						LocalDateTime departTimeLocal = LocalDateTime.parse(departDate,flightDateFormat);
@@ -446,11 +446,27 @@ public class ConsoleUI {
 					System.exit(0);
 				} else {
 					if(input.equals("y") || input.equals("Y")) {
-						// reserve flights here
-						retry = true;
+						int attempts = 0;
+						for(ReservationOption op:selectedOptions) {
+							attempts = 0;
+							// chose random number of 3 for retries
+							while(!op.reserveFlights(mSeatPreference) && attempts < 3) {
+								System.out.println("!!!Failed to reserve, trying again!!");
+								attempts++;
+							}
+							if(attempts > 2) { // magic number to account for retry attempts.
+								System.out.println("!!!Failed to reserve tickets, exiting!!");
+								break;
+							}
+						}
+						if(attempts > 2) {
+							retry = false;
+						} else {
+							retry = true;
+						}
 						confirmed = true;
 					} else if(input.equals("n") || input.equals("N")) {
-						System.out.println("Graceful case not supported yet - restart app");
+						System.out.println("!Restarting selection process!");
 						retry = false;
 						confirmed = true;
 					} else {

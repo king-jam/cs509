@@ -1,6 +1,5 @@
 package client.search;
 
-import java.io.StringWriter;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
@@ -12,21 +11,12 @@ import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.TimeZone;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Queue;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-
+import client.airplanes.Airplane;
+import client.airplanes.Airplanes;
+import client.airplanes.ModelComparator;
 import client.dao.*;
 import client.flight.*;
 import client.util.*;
@@ -50,6 +40,7 @@ public class FlightSearch {
 	private String mSeatPreference;
 	private String mTicketAgency;
 	private ServerInterfaceCache mServerInterface;
+	private Airplanes mAirplanes;
 
 	/**
 	 * Constructor
@@ -69,6 +60,9 @@ public class FlightSearch {
 		this.mSeatPreference = seatPreference;
 		this.mTicketAgency=Configuration.getAgency();
 		this.mServerInterface=ServerInterfaceCache.getInstance();
+		this.mAirplanes = new Airplanes();
+		mAirplanes.addAll(mServerInterface.getAirplanes(mTicketAgency));
+		Collections.sort(this.mAirplanes, new ModelComparator());
 	}
 
 	/**
@@ -157,12 +151,18 @@ public class FlightSearch {
 	 * @return true if constraint is followed else returns false.
 	 */
 	public boolean seatsAvailable(Flight flight) {
+		int index = Collections.binarySearch(this.mAirplanes,
+				new Airplane("", flight.getmAirplane(), 0, 0),
+				new ModelComparator());
+		if(index < 0) {
+			return false;
+		}
 		if(this.mSeatPreference.equals("FirstClass")) {
-			if(flight.getmSeatsFirstclass() == 0) {
+			if(flight.getmSeatsFirstclass() >= this.mAirplanes.get(index).firstClassSeats()) {
 				return false;
 			}
 		} else {
-			if(flight.getmSeatsCoach() == 0) {
+			if(flight.getmSeatsCoach() >= this.mAirplanes.get(index).coachSeats()) {
 				return false;
 			}
 		}
@@ -250,56 +250,5 @@ public class FlightSearch {
 			}
 		}
 		return reservedOptions;
-	}
-
-	public boolean reserveFlight(ReservationOption selectedOption){
-		//get the lock to the DB
-		if(!mServerInterface.lock(Configuration.TICKET_AGENCY)){
-			System.out.println("Lock not available.Try again Later");
-			return false;
-		}
-		//creating a XML string of flight data
-		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-		try {
-			Flight flight;
-			Element flight_xml;
-			DocumentBuilder db = dbf.newDocumentBuilder();
-			Document document = db.newDocument();
-			Element root = document.createElement("Flights");
-			document.appendChild(root);
-			for(int j=0;j<3;j++){
-				flight=selectedOption.getFlight(j);
-				if(flight==null)
-					break;
-				flight_xml=document.createElement("Flight");
-				flight_xml.setAttribute("number",flight.getmNumber());
-				flight_xml.setAttribute("seating",this.mSeatPreference);
-				root.appendChild(flight_xml);
-			}
-			TransformerFactory tf = TransformerFactory.newInstance();
-			Transformer transformer = tf.newTransformer();
-			transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
-			StringWriter writer = new StringWriter();
-			transformer.transform(new DOMSource(document), new StreamResult(writer));
-
-			if(mServerInterface.buyTickets(Configuration.TICKET_AGENCY,writer.toString())){
-				mServerInterface.unlock(Configuration.TICKET_AGENCY);
-				return true;
-			}
-			else{
-				mServerInterface.unlock(Configuration.TICKET_AGENCY);
-				mServerInterface.clearFlightCache();
-				return false;
-			}
-
-		} catch (ParserConfigurationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return false;
-		} catch (TransformerException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return false;
-		}
 	}
 }

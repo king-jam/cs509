@@ -39,6 +39,7 @@ public class ServerInterfaceCache {
 	private CacheManager cacheManager;
 	private Cache<String, String> airportCache;
 	private Cache<String, String> flightCache;
+	private Cache<String, String> airplaneCache;
 
 	private static ServerInterfaceCache instance; 
 
@@ -57,6 +58,11 @@ public class ServerInterfaceCache {
 				)
 				.build(true);
 		this.airportCache = this.cacheManager.getCache("airports", String.class, String.class);
+		this.airplaneCache = this.cacheManager.createCache("airplanes",
+				CacheConfigurationBuilder.newCacheConfigurationBuilder(String.class, String.class, 
+						ResourcePoolsBuilder.newResourcePoolsBuilder()
+						.heap(10, EntryUnit.ENTRIES)
+						.offheap(10, MemoryUnit.MB)).build());
 		this.flightCache = this.cacheManager.createCache("flights", 
 				CacheConfigurationBuilder.newCacheConfigurationBuilder(String.class, String.class, 
 						ResourcePoolsBuilder.newResourcePoolsBuilder()
@@ -383,7 +389,58 @@ public class ServerInterfaceCache {
 			e.printStackTrace();
 			return false;
 		}
+	}
+	
+	/**
+	 * Return an XML list of all the airplanes
+	 * 
+	 * Retrieve the list of airplanes available to the specified ticketAgency via HTTPGet of the server
+	 * 
+	 * @param team identifies the Team requesting the information
+	 * @return xml string listing all airplanes
+	 */	
+	public String getAirplanes (String team) {
 
+		URL url;
+		HttpURLConnection connection;
+		BufferedReader reader;
+		String line;
+		StringBuffer result = new StringBuffer();
+		String res = this.airplaneCache.get(team);
+		if (res == null) {
+			try {
+				/**
+				 * Create an HTTP connection to the server for a GET 
+				 */
+				url = new URL(mUrlBase + QueryFactory.getAirplanes(team));
+				connection = (HttpURLConnection) url.openConnection();
+				connection.setRequestMethod("GET");
 
+				/**
+				 * If response code of SUCCESS read the XML string returned
+				 * line by line to build the full return string
+				 */
+				int responseCode = connection.getResponseCode();
+				if ((responseCode >= 200) && (responseCode <= 299)) {
+					InputStream inputStream = connection.getInputStream();
+					String encoding = connection.getContentEncoding();
+					encoding = (encoding == null ? "URF-8" : encoding);
+
+					reader = new BufferedReader(new InputStreamReader(inputStream));
+					while ((line = reader.readLine()) != null) {
+						result.append(line);
+					}
+					reader.close();
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			res = result.toString();
+			this.airplaneCache.put(team, res);
+			return res;
+		}
+		return res;
 	}
 }

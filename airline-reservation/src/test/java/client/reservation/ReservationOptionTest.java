@@ -1,8 +1,12 @@
 package client.reservation;
 
+import java.text.ParseException;
 import java.util.ArrayList;
 
+import client.dao.ServerInterfaceCache;
 import client.flight.Flight;
+import client.search.FlightSearch;
+import client.util.Configuration;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
@@ -150,4 +154,24 @@ public class ReservationOptionTest extends TestCase {
 		assertEquals("The returned price is not a match", 67.11, res.getPrice("FirstClass"));
 		assertEquals("The returned total time is not INVALID", "INVALID", res.getTotalTime());
 	}
+	
+	/**
+	 * Testing reserveFlight() of class
+	 */
+	public void testReserveFlight() throws ParseException{
+		//testing whether the getoptions() returns the same no .of results for a set of parameters
+		//testing whether the first three results match
+		ServerInterfaceCache serverInterfaceCache=ServerInterfaceCache.getInstance();
+		//reseting the database to its original state
+		boolean resetCheck=serverInterfaceCache.resetDB(Configuration.TICKET_AGENCY);
+		assertEquals("Not able to ResetDB to original state",true,resetCheck);
+
+		FlightSearch search1=new FlightSearch("BOS","LGA","2016 May 10 03:05 GMT", "FirstClass");
+		FlightSearch search2=new FlightSearch("BOS","LGA","2016 May 10 03:05 GMT", "Coach");
+		//Verifying the seat count increased after using the reservation functionality
+
+		assertEquals("Reservation functionality not working for booking first class seats", true,search1.getOptions().get(0).reserveFlights("FirstClass"));
+		assertEquals("Reservation functionality not working for booking Coach seats", true,search2.getOptions().get(0).reserveFlights("Coach"));
+	}
+
 }

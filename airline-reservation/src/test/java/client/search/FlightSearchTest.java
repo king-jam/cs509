@@ -118,37 +118,19 @@ public class FlightSearchTest extends TestCase {
 				"DEN",
 				"2016 May 10 08:30 GMT",
 				"$87.11",
-				0,
+				29, // max first class seats on 737 is 28
 				"$28.79",
-				0
+				100 // max coach seats on 737 is 100 - shows flight is full
 				);
 
 		FlightSearch search1=new FlightSearch(null, null, null, "FirstClass");
 		FlightSearch search2=new FlightSearch(null, null, null, "Coach");
 
-		assertEquals("Expected true as # seats First Class>0",true, search1.seatsAvailable(f1));
-		assertEquals("Expected true as # seats Coach>0",true, search2.seatsAvailable(f1));
-		assertEquals("Expected false as # seats First Class=0",false, search1.seatsAvailable(f2));
-		assertEquals("Expected false as # seats Coach=0",false, search2.seatsAvailable(f2));
+		assertEquals("Expected true as # seats First Class<available",true, search1.seatsAvailable(f1));
+		assertEquals("Expected true as # seats Coach<available",true, search2.seatsAvailable(f1));
+		assertEquals("Expected false as # seats First Class>available",false, search1.seatsAvailable(f2));
+		assertEquals("Expected false as # seats Coach=available",false, search2.seatsAvailable(f2));
 
-	}
-	/**
-	 * Testing reserveFlight() of class
-	 */
-	public void testReserveFlight() throws ParseException{
-		//testing whether the getoptions() returns the same no .of results for a set of parameters
-		//testing whether the first three results match
-		ServerInterfaceCache serverInterfaceCache=ServerInterfaceCache.getInstance();
-		//reseting the database to its original state
-		boolean resetCheck=serverInterfaceCache.resetDB(Configuration.TICKET_AGENCY);
-		assertEquals("Not able to ResetDB to original state",true,resetCheck);
-
-		FlightSearch search1=new FlightSearch("BOS","LGA","2016 May 10 03:05 GMT", "FirstClass");
-		FlightSearch search2=new FlightSearch("BOS","LGA","2016 May 10 03:05 GMT", "Coach");
-		//Verifying the seat count increased after using the reservation functionality
-
-		assertEquals("Reservation functionality not working for booking first class seats", true,search1.reserveFlight(search1.getOptions().get(0)));
-		assertEquals("Reservation functionality not working for booking Coach seats", true,search1.reserveFlight(search2.getOptions().get(0)));
 	}
 
 	public void testGetOptions() throws ParseException{
@@ -249,7 +231,7 @@ public class FlightSearchTest extends TestCase {
 		option=new ReservationOption(list);
 		testOptions.add(option);
 		//expecting 8 search results for a given set of parameters
-		assertEquals("Expected no.of search results different",8,expectedOptions.size());
+		assertEquals("Expected no.of search results different",9,expectedOptions.size());
 
 		for(int i=0;i<testOptions.size();i++){
 			for(int j=0;j<testOptions.get(i).getNumFlights();j++){

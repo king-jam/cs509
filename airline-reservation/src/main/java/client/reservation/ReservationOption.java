@@ -3,8 +3,11 @@
  */
 package client.reservation;
 
+import client.dao.ServerInterfaceCache;
 import client.flight.*;
+import client.util.Configuration;
 
+import java.io.StringWriter;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
@@ -14,6 +17,19 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 /**
  * This class is an amalgamation class of all Flights needed to create a potential
  * travel option that gets a user to their destination. It provides the superset
@@ -164,5 +180,53 @@ public class ReservationOption {
 		BigDecimal bd = new BigDecimal(value);
 		bd = bd.setScale(places, RoundingMode.HALF_UP);
 		return bd.doubleValue();
+	}
+	
+	public boolean reserveFlights(String mSeatPreference){
+		//get the lock to the DB
+		ServerInterfaceCache mServerInterface = ServerInterfaceCache.getInstance();
+		if(!mServerInterface.lock(Configuration.TICKET_AGENCY)){
+			System.out.println("Lock not available.Try again Later");
+			return false;
+		}
+		//creating a XML string of flight data
+		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+		try {
+			Flight flight;
+			Element flight_xml;
+			DocumentBuilder db = dbf.newDocumentBuilder();
+			Document document = db.newDocument();
+			Element root = document.createElement("Flights");
+			document.appendChild(root);
+			for(int j=0;j<this.getNumFlights();j++){
+				flight=this.getFlight(j);
+				flight_xml=document.createElement("Flight");
+				flight_xml.setAttribute("number",flight.getmNumber());
+				flight_xml.setAttribute("seating",mSeatPreference);
+				root.appendChild(flight_xml);
+			}
+			TransformerFactory tf = TransformerFactory.newInstance();
+			Transformer transformer = tf.newTransformer();
+			transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+			StringWriter writer = new StringWriter();
+			transformer.transform(new DOMSource(document), new StreamResult(writer));
+
+			if(mServerInterface.buyTickets(Configuration.TICKET_AGENCY,writer.toString())){
+				mServerInterface.unlock(Configuration.TICKET_AGENCY);
+				mServerInterface.clearFlightCache();
+				return true;
+			} else{
+				mServerInterface.unlock(Configuration.TICKET_AGENCY);
+				return false;
+			}
+		} catch (ParserConfigurationException e) {
+			e.printStackTrace();
+			mServerInterface.unlock(Configuration.TICKET_AGENCY);
+			return false;
+		} catch (TransformerException e) {
+			e.printStackTrace();
+			mServerInterface.unlock(Configuration.TICKET_AGENCY);
+			return false;
+		}
 	}
 }
