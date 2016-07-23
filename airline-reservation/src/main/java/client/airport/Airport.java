@@ -44,8 +44,6 @@ public class Airport {
 	 * Constructor without params. Requires object fields to be explicitly
 	 * set using setter methods
 	 * 
-	 * @precondition None
-	 * @postcondition member attributes are initialized to invalid default values
 	 */	
 	public Airport () {
 		mName = "";
@@ -65,8 +63,6 @@ public class Airport {
 	 * @param latitude The north/south coordinate of the airport 
 	 * @param longitude The east/west coordinate of the airport
 	 * 
-	 * @preconditions code is a 3 character string, latitude and longitude are valid values
-	 * @postconditions member attributes are initialized with input parameter values
 	 */
 	public Airport (String name, String code, double latitude, double longitude) {
 		mName = name;
@@ -86,7 +82,6 @@ public class Airport {
 	 * @param latitude is the string representation of latitude decimal format 
 	 * @param longitude is the String representation of the longitude in decimal format
 	 * 
-	 * @preconditions the latitude and longitude are valid String representations of decimal values
 	 */
 	public Airport (String name, String code, String latitude, String longitude) {
 		this (name, code, Double.parseDouble(latitude), Double.parseDouble(latitude));

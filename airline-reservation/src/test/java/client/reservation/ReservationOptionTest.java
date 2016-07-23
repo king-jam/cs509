@@ -157,6 +157,8 @@ public class ReservationOptionTest extends TestCase {
 	
 	/**
 	 * Testing reserveFlight() of class
+	 * 
+	 * @throws ParseException is thrown if the flightsearch options returns a parse failure
 	 */
 	public void testReserveFlight() throws ParseException{
 		//testing whether the getoptions() returns the same no .of results for a set of parameters

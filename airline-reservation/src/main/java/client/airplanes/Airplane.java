@@ -29,8 +29,6 @@ public class Airplane {
 	 * The default ctor initializes the object instance to default / invalid values.
 	 * The setter methods must be called to set each member attribute to a valid value.
 	 * 
-	 * @precondition None
-	 * @postcondition attributes are initialized with invalid values 
 	 */
 	public Airplane () {
 		mManufacturer = "";
@@ -49,8 +47,6 @@ public class Airplane {
 	 * @param firstClassSeats is the number of first class seats available on the model
 	 * @param coachSeats is the number of coach seats available on the model
 	 * 
-	 * @precondition None
-	 * @postcondition attribute members initialized with input parameters
 	 */
 	public Airplane (String manufacturer, String model, int firstClassSeats, int coachSeats) {
 		mManufacturer = manufacturer;

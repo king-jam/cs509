@@ -46,7 +46,7 @@ public class ConsoleUI {
 	 * 
 	 * @param option contains the ReservationOption 
 	 * @param seatPreference contains the client seat preference for price display
-	 * @throws Exception 
+	 * @throws Exception if timezone api fails to get a timezone
 	 * 
 	 */
 	public static void printReservationOption(ReservationOption option, String seatPreference) throws Exception {
@@ -62,7 +62,6 @@ public class ConsoleUI {
 			Airport arrAirport = getAirportFromCode(flight.getmCodeArrival());
 			String departTime = timeLocal.getLocalTime(flight.getmTimeDepart(), depAirport.timezone());
 			String arrivalTime = timeLocal.getLocalTime(flight.getmTimeArrival(), arrAirport.timezone());
-			//System.out.println("\t"+flight.getmTimeDepart()+" - "+flight.getmTimeArrival());
 			System.out.println("\t"+departTime+" - "+arrivalTime);
 			if(j == 0) {
 				startTime = departTime;
@@ -72,8 +71,6 @@ public class ConsoleUI {
 			}
 		}
 
-		//System.out.println("\tDeparture: "+option.getFlight(0).getmTimeDepart());
-		//System.out.println("\tArrival: "+option.getFlight(option.getNumFlights()-1).getmTimeArrival());
 		System.out.println("\tDeparture: "+startTime);
 		System.out.println("\tArrival: "+endTime);
 		System.out.println("\tTotal Travel Time: "+option.getTotalTime());
@@ -132,7 +129,7 @@ public class ConsoleUI {
 	 * parses the input string for integers and handles errors
 	 * 
 	 * @param input string contains the console input from the client
-	 * 
+	 * @return integer if the string can be properly parsed to that
 	 */
 	public static int parseSelectionInt(String input) {
 		int selection = 0;
@@ -171,7 +168,8 @@ public class ConsoleUI {
 	}
 	/**
 	 * main runner function to take user input, search for flights, and display options
-	 * @throws Exception 
+	 * @param args are arguments passed in by OS
+	 * @throws Exception as a general collector of errors through run
 	 * 
 	 */
 	public static void main(String[] args) throws Exception {
@@ -230,7 +228,7 @@ public class ConsoleUI {
 					String input = scan.next();
 					exitCheck(input);
 					int selection = parseSelectionInt(input);
-					if(selection < 0 || selection > airports.size()) {
+					if(selection <= 0 || selection > airports.size()) {
 						printInvalidSelection();
 					} else {
 						depAirport = true;
@@ -247,7 +245,7 @@ public class ConsoleUI {
 					String input = scan.next();
 					exitCheck(input);
 					int selection = parseSelectionInt(input);
-					if(selection < 0 || selection > airports.size()) {
+					if(selection <= 0 || selection > airports.size()) {
 						printInvalidSelection();
 					} else {
 						arrAirport = true;
@@ -256,6 +254,7 @@ public class ConsoleUI {
 				}
 				boolean depDate = false;
 				while(!depDate) {
+					boolean flag = false;
 					System.out.print("Please enter DEPARTURE date [format - 2016 May 10 15:25 (use 24hr time)]:");
 					String in1 = scan.next();
 					String in2 = scan.nextLine();
@@ -267,10 +266,12 @@ public class ConsoleUI {
 						LocalDateTime departTimeLocal = LocalDateTime.parse(departDate,flightDateFormat);
 					} catch (DateTimeParseException e) {
 						printInvalidFormat();
-						break;
+						flag = true;
 					}
-					depDate = true;
-					mDepartureDate = departDate;
+					if(!flag) {
+						depDate = true;
+						mDepartureDate = departDate;
+					}
 				}				
 				boolean seatPref = false;
 				while(!seatPref) {
@@ -392,7 +393,7 @@ public class ConsoleUI {
 							+ "------------------------------------\n",i+1);
 					printReservationOption(option, mSeatPreference);
 				}
-	
+
 				System.out.print("Please select a reservation option or display mechanism [enter #/pa/pd/ta/td]: ");
 				String input = scan.next();
 				exitCheck(input);
@@ -405,7 +406,7 @@ public class ConsoleUI {
 					continue;
 				}
 				int selection = parseSelectionInt(input);
-				if(selection < 0 || selection > toOptions.size()) {
+				if(selection <= 0 || selection > toOptions.size()) {
 					printInvalidSelection();
 				} else {
 					selectedToReservation = true;
@@ -438,7 +439,7 @@ public class ConsoleUI {
 								+ "------------------------------------\n",i+1);
 						printReservationOption(option, mSeatPreference);
 					}
-	
+
 					System.out.print("Please select a reservation option [enter #]: ");
 					String input = scan.next();
 					exitCheck(input);
@@ -451,7 +452,7 @@ public class ConsoleUI {
 						continue;
 					}
 					int selection = parseSelectionInt(input);
-					if(selection < 0 || selection > retOptions.size()) {
+					if(selection <= 0 || selection > retOptions.size()) {
 						printInvalidSelection();
 					} else {
 						selectedFromReservation = true;
@@ -468,7 +469,7 @@ public class ConsoleUI {
 				ReservationOption option = selectedOptions.get(0);
 				System.out.println("------------TO TRIP-------------");
 				printReservationOption(option, mSeatPreference);
-	
+
 				// print returnTrip
 				if(!mOneWay) {
 					option = selectedOptions.get(1);
@@ -483,7 +484,7 @@ public class ConsoleUI {
 					price += ops.getPrice(mSeatPreference);
 				}
 				System.out.println("Total Price: $"+String.format( "%.2f", price));
-	
+
 				System.out.print("Confirm Reservation? [y/n]: ");
 				String input = scan.next();
 				if(input.equals("q")) {

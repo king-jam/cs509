@@ -12,7 +12,6 @@ public class ServerInterfaceCacheTest extends TestCase{
 	 * Create the test case
 	 *
 	 * @param testName name of the test case
-	 * @return 
 	 */
 	public ServerInterfaceCacheTest( String testName ){
 		super(testName);
@@ -28,6 +27,8 @@ public class ServerInterfaceCacheTest extends TestCase{
 
 	/**
 	 * test the working of the cache 
+	 * 
+	 * @throws ParseException throws an exception if there is a date parsing failure
 	 */
 	public void testCache() throws ParseException {
 

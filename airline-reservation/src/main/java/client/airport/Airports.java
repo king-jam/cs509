@@ -42,8 +42,6 @@ public class Airports extends ArrayList<Airport> {
 	 * @return true if the collection was modified, false otherwise
 	 * @throws NullPointerException included to keep signature consistent with other addAll methods
 	 * 
-	 * @preconditions the xmlAirports string adheres to the format specified by the server API
-	 * @postconditions the [possibly empty] set of Airports in the XML string are added to collection
 	 */
 	public boolean addAll (String xmlAirports) throws NullPointerException {
 		
@@ -108,7 +106,6 @@ public class Airports extends ArrayList<Airport> {
 	 * @param nodeAirport is a DOM Node describing an Airport
 	 * @return Airport object created from the DOM Node representation of the Airport
 	 * 
-	 * @preconditions nodeAirport is of format specified by CS509 server API
 	 */
 	private Airport buildAirport (Node nodeAirport) {
 		/**

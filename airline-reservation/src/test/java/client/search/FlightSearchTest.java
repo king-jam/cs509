@@ -25,7 +25,7 @@ public class FlightSearchTest extends TestCase {
 	/**
 	 * Create the test case
 	 * 
-	 * @param testName
+	 * @param testName is the passed in test name to the TestCase
 	 */
 	public FlightSearchTest(String testName){
 		super( testName );
@@ -33,6 +33,8 @@ public class FlightSearchTest extends TestCase {
 
 	/**
 	 * Testing dateFormatter() of the class
+	 * 
+	 * @throws ParseException is thrown if the test date formatter isn't able to parse
 	 */
 	public void testDateFormatter() throws ParseException {
 		FlightSearch search=new FlightSearch(null, null, null, null);
@@ -45,6 +47,8 @@ public class FlightSearchTest extends TestCase {
 
 	/**
 	 * Testing the method checkNextDayFlight() of the class
+	 * 
+	 * @throws ParseException is thrown if the test formatter isn't able to parse
 	 */
 	public void testCheckNextDayFlight() throws ParseException{
 		FlightSearch search=new FlightSearch(null, null, null, null);
@@ -59,6 +63,8 @@ public class FlightSearchTest extends TestCase {
 
 	/**
 	 * testing addOneDay() method of the class
+	 * 
+	 * @throws ParseException is thrown if the test formatter fails to parse the date
 	 */
 	public void testAddOneDay() throws ParseException {
 		FlightSearch search=new FlightSearch(null, null, null, null);
@@ -69,6 +75,8 @@ public class FlightSearchTest extends TestCase {
 
 	/**
 	 * test isValidLayover() method of class
+	 * 
+	 * @throws ParseException is thrown if the test formatter fails to parse the date
 	 */
 	public void testIsValidLayover() throws ParseException{
 		FlightSearch search=new FlightSearch(null, null, null, null);

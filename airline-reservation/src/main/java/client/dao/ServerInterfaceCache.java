@@ -356,6 +356,7 @@ public class ServerInterfaceCache {
 	 * Reset the database to its original state
 	 * 
 	 * @param team identifies the team making the request
+	 * @return boolean of whether reset was successful (true) or not (false)
 	 */
 	public boolean resetDB(String team){
 		URL url;

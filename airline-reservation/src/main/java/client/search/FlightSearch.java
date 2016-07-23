@@ -46,9 +46,9 @@ public class FlightSearch {
 	 * Constructor
 	 * 
 	 * @param departureAirportCode (required) valid departure airport code.
-	 * @param ArrivalAirportCode (required) valid arrival airport code.
-	 * @param seatPrefrence represents first class or coach seating.
-	 * @param Departuredate represents departure date in "yyyy MMM dd HH:mm z" format.
+	 * @param arrivalAirportCode (required) valid arrival airport code.
+	 * @param departuredate represents departure date in "yyyy MMM dd HH:mm z" format.
+	 * @param seatPreference represents first class or coach seating.
 	 */
 	public FlightSearch(String departureAirportCode,
 			String arrivalAirportCode,
@@ -70,7 +70,7 @@ public class FlightSearch {
 	 * 
 	 * @param date represents the string in "yyyy MMM dd HH:mm z" format.
 	 * @return string in "yyyy_MM_dd" format.
-	 * @throws ParseException
+	 * @throws ParseException if the date parsing fails
 	 */
 	public String dateFormatter(String date) throws ParseException{
 
@@ -87,7 +87,7 @@ public class FlightSearch {
 	 * 
 	 * @param arrivalTime represents the arrival time of a flight in "yyyy MMM dd HH:mm z" string format.
 	 * @return true if arrival time of a flight is after 9pm else returns false boolean value.
-	 * @throws ParseException
+	 * @throws ParseException if the date parsing fails
 	 */
 	public boolean checkNextDayFlight(String arrivalTime) throws ParseException {
 		SimpleDateFormat formatter=new  SimpleDateFormat("yyyy MMM dd HH:mm z");
@@ -107,7 +107,7 @@ public class FlightSearch {
 	 * 
 	 * @param date represents the date  in "yyyy MMM dd HH:mm z" string format.
 	 * @return date which is incremented by one,also represented in "yyyy MMM dd HH:mm z" string format.
-	 * @throws ParseException
+	 * @throws ParseException if the date parsing fails
 	 */
 	public String addOneday(String date) throws ParseException{
 		SimpleDateFormat formatter=new  SimpleDateFormat("yyyy MMM dd HH:mm z");
@@ -119,12 +119,12 @@ public class FlightSearch {
 	}
 
 	/**
-	 * This method checks for the constraints that the layover_time >= 30min and layover_time<=3hrs.
+	 * This method checks for the constraints that the layover_time is greater than 30mins and layover_time less than 3hrs.
 	 * The above constraint is verified for connecting flights
 	 * @param arrivalTime represents the arrival time of a flight in "yyyy MMM dd HH:mm z" string format.
 	 * @param departureTime represents the departure time of a connecting flight in "yyyy MMM dd HH:mm z" string format.
 	 * @return true if constraint is followed else returns false.
-	 * @throws ParseException
+	 * @throws ParseException is thrown when the date parsing fails
 	 */
 	public boolean isValidLayover(String arrivalTime,String departureTime) throws ParseException{
 		long layover = 0;
@@ -183,9 +183,9 @@ public class FlightSearch {
 	}
 
 	/**
-	 * This method clones a list of type ArrayList<Flight>
-	 * @param list
-	 * @return  a cloned list of type ArrayList<Flight>
+	 * This method clones an ArrayList of type Flight
+	 * @param list is an ArrayList of type Flight
+	 * @return  a cloned ArrayList of type Flight
 	 */
 	public static ArrayList<Flight> cloneList(ArrayList<Flight> list) {
 		ArrayList<Flight> clone = new ArrayList<Flight>(list.size());
@@ -197,7 +197,7 @@ public class FlightSearch {
 	/**
 	 * This method uses the search parameters to search for valid flights 
 	 * @return an arrayList of the type {@link client.reservation.ReservationOption}
-	 * @throws ParseException
+	 * @throws ParseException is thrown if the date is not parsed
 	 */
 	public ArrayList<ReservationOption> getOptions() throws ParseException{
 

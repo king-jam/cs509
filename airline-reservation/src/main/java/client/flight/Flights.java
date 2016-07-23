@@ -101,7 +101,6 @@ public class Flights extends ArrayList <Flight> {
 	 * @param nodeFlight is a DOM Node describing an Airport
 	 * @return Flight object created from the DOM Node representation of the Flight
 	 * 
-	 * @preconditions nodeFlight is of format specified by CS509 server API
 	 */
 	private Flight buildFlight (Node nodeFlight) {
 		/**

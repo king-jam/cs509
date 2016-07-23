@@ -39,8 +39,6 @@ public class Airplanes extends ArrayList<Airplane> {
 	 * @return true if the collection was modified, false otherwise
 	 * @throws NullPointerException included to keep signature consistent with other addAll methods
 	 * 
-	 * @preconditions the xmlAirplanes string adheres to the format specified by the server API
-	 * @postconditions the [possibly empty] set of Airplanes in the XML string are added to collection
 	 */
 	public boolean addAll (String xmlAirplanes) throws NullPointerException {
 		
@@ -105,7 +103,6 @@ public class Airplanes extends ArrayList<Airplane> {
 	 * @param nodeAirplane is a DOM Node describing an Airplane
 	 * @return Airplane object created from the DOM Node representation of the Airplane
 	 * 
-	 * @preconditions nodeAirplane is of format specified by CS509 server API
 	 */
 	private Airplane buildAirplane (Node nodeAirplane) {
 		/**
